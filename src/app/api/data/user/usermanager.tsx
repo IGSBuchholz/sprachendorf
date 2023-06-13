@@ -36,7 +36,7 @@ import { User, users, NewUser } from './user'; // The User entity defined above.
     export async function setAdmin(email: string, isAdmin: boolean): Promise<boolean> {
         try{
             const connection = await getDatabaseConnection();
-            await connection.update(users).set({isAdmin: isAdmin});    
+            await connection.update(users).set({isAdmin: isAdmin}).where(eq(users.email, email));
         }catch(e){
             return false;
         }

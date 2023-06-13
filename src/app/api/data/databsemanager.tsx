@@ -9,6 +9,7 @@ const configFilePath = path.resolve(__dirname, 'dbConfig.json');
 let dbCon: PostgresJsDatabase;
 
 export async function saveDatabaseConfiguration(connectionOptions: any): Promise<void> {
+    console.warn("WRITING DATABASE CONFIGURATION FOR SOME REASON")
     fs.writeFileSync(configFilePath, JSON.stringify(connectionOptions, null, 2));
 }
 

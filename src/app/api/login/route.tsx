@@ -1,12 +1,13 @@
 'use server'
 import { NextRequest, NextResponse } from "next/server";
-import { issueSession } from "../data/sessionmanager";
+import {createToken, issueSession} from "../data/sessionmanager";
 import { evaluateAuthCode, AuthCodeEvaluationResult } from "../data/authcode/authcodemanager";
 import { issueAuthCode, AuthCodeIssueingResult } from '../data/authcode/authcodemanager';
+import {getConfiguration} from "@/app/api/data/config/configmanager";
 
 export async function POST(req: Request) {
 
-    const emailRegex = new RegExp(process.env.NEXT_PUBLIC_EMAIL_REGEX as string)
+    const emailRegex = new RegExp(getConfiguration('email_regex') as string)
 
     const body = await req.json();
 
@@ -26,33 +27,29 @@ export async function POST(req: Request) {
     const code: string = body.code;
 
     //Check if it is a code request (Code is part of Body)
-    if(code){
+    if(code) {
 
-      const loginStatus = await evaluateAuthCode(mail, code);
+        const loginStatus = await evaluateAuthCode(mail, code);
 
-      console.log("*********\n Result of Request to /api/login (w/ AuthCode): \n Email: " + mail +  " \n LoginStatus: " + loginStatus + "\n*********");
+        console.log("*********\n Result of Request to /api/login (w/ AuthCode): \n Email: " + mail + " \n LoginStatus: " + loginStatus + "\n*********");
 
-      if(loginStatus==AuthCodeEvaluationResult.SUCCESS){
+        if (loginStatus == AuthCodeEvaluationResult.SUCCESS) {
 
-        const authToken = await issueSession(mail)
-        
-        const response = new NextResponse(loginStatus.toString());
+            const token = createToken({ id: user.id, email: user.email })
 
-        response.cookies.set(
-          {
-            name: "token", 
-            value: authToken
-          });
-      }
+            // Set the token as a cookie
+            return new NextResponse("User Logged In", {
+                status: 200,
+                headers: {
+                    'Set-Cookie': `token=${token}; Path=/; HttpOnly; SameSite=Lax`,
+                },
+            });
 
-      return new NextResponse(loginStatus.toString());
-      return;
+        }
 
+        issueAuthCode(mail);
+
+
+        return new NextResponse("SUCCESS")
     }
-
-    issueAuthCode(mail);
-    
-
-    return new NextResponse("SUCCESS")
-
 }

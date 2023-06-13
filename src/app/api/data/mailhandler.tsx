@@ -1,7 +1,7 @@
 'use server';
 import { getConfiguration } from "./config/configmanager";
 
-export const sgMail = require('@sendgrid/mail');
+const sgMail = require('@sendgrid/mail');
 
 export async function getMailHandler(customKey = ""): Promise<any>{
 
@@ -10,13 +10,15 @@ export async function getMailHandler(customKey = ""): Promise<any>{
         sgMail.setApiKey(customKey)
     
     }else{
-    
-        const configKey = await getConfiguration("sg_ApiKey");
-        if(configKey != undefined){
-            sgMail.setApiKey(configKey);
+
+        try{
+            const configKey = await getConfiguration("sg_ApiKey");
+            if(configKey != undefined){
+                sgMail.setApiKey(configKey);
+            }
+        }catch(e){
+            return "Error";
         }
-        return "Error";
-    
     }
 
     return sgMail;
@@ -37,7 +39,7 @@ export async function sendLoginMail(email: string, authCode: number){
         return SendMailResult.MAILHANDLER_ERROR;
     }
 
-    const fromMail = await getConfiguration("sg_SendMail")
+    const fromMail = await getConfiguration("sg_Sender")
     if(fromMail == undefined){
         return SendMailResult.FROMMAIL_UNKNOWN;
     }
@@ -57,11 +59,12 @@ export async function sendLoginMail(email: string, authCode: number){
               "CODE": authCode
             }
         };
-        mailHandler.send(msg);
+        await mailHandler.send(msg);
 
     }catch(err){
 
         console.error("Error (sendLoginMail:mailhandler.tsx)", err)
+        console.log(err.response.body.errors)
         return SendMailResult.SENDERROR;
 
     }

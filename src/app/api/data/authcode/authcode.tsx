@@ -1,16 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn } from 'typeorm';
+import {boolean, date, integer, pgTable, serial, text, varchar} from "drizzle-orm/pg-core";
+import { InferModel, eq, sql } from 'drizzle-orm';
 
-@Entity('AuthCode')
-export class AuthCode {
-    @PrimaryGeneratedColumn()
-    id!: number;
+export const authCodes = pgTable('authCode', {
+    id: serial('id').primaryKey(),
+    email: text('email').notNull(),
+    authCode: integer('authCode'),
+    expiresAt: date('expiresAt'),
+});
 
-    @Column({ unique: false })
-    email!: string;
 
-    @Column({ default: false })
-    authCode!: number;
+export type authCode = InferModel<typeof authCodes>;
 
-    @Column({ type: 'datetime', nullable: true })
-    expiresAt!: Date;
-}
+export type NewAuthCode = InferModel<typeof authCodes, 'insert'>;

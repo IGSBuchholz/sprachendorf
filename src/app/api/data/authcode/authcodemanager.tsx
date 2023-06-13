@@ -1,7 +1,10 @@
+import {NewUser} from "@/app/api/data/user/user";
+
 const sgMail = require('@sendgrid/mail');
 import { sendLoginMail } from "../mailhandler";
-import { AuthCode } from "./authcode";
+import {authCode, authCodes, NewAuthCode} from "./authcode";
 import { getDatabaseConnection } from "../databsemanager";
+import {eq} from "drizzle-orm";
 
   export enum AuthCodeIssueingResult {
     SUCCESS = 'SUCCESS',
@@ -18,19 +21,21 @@ import { getDatabaseConnection } from "../databsemanager";
     try{
       const connection = await getDatabaseConnection();
 
-      const authCodeRepository = connection.getRepository(AuthCode);  
+      const newAuthCode: NewAuthCode = {email: email, authCode, expiresAt: expiresAt}
 
-      await authCodeRepository.create({email, authCode, expiresAt})
+      await connection.insert(authCodes).values({email: email, authCode, expiresAt: expiresAt});
 
     }catch(err){
-        
+
+      console.log(err)
+
       return AuthCodeIssueingResult.DATABASE_ERROR;
 
     }
 
     try{
 
-      sendLoginMail(email, authCode);
+      await sendLoginMail(email, authCode);
 
     }catch(err){
 
@@ -51,20 +56,21 @@ import { getDatabaseConnection } from "../databsemanager";
     CODE_NOT_FOUND = 'CODE NOT FOUND',
   }
 
-  export async function evaluateAuthCode(email: string, authCode: string): Promise<AuthCodeEvaluationResult> {
+  export async function evaluateAuthCode(email: string, authCode: number): Promise<AuthCodeEvaluationResult> {
     try {
       const connection = await getDatabaseConnection();
 
-      const authCodeRepository = connection.getRepository(AuthCode);
+      const resL = await connection.select().from(authCodes).where(eq(authCodes.email, email)).where(eq(authCodes.authCode, authCode));
 
-      const codeEntry = await authCodeRepository.findOneBy({
-        email: email,
-        authCode: Number(authCode)
-      })
+      if(!resL.length>0){
+        return AuthCodeEvaluationResult.CODE_NOT_FOUND;
+      }
+
+      const codeEntry: authCode = resL[0];
 
       if(codeEntry){
 
-        if(new Date() > codeEntry.expiresAt){
+        if(new Date() < codeEntry.expiresAt){
           return AuthCodeEvaluationResult.SUCCESS;
         }
         return AuthCodeEvaluationResult.CODE_EXPIRED;
