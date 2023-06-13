@@ -1,42 +1,46 @@
+import { eq } from 'drizzle-orm';
 import { getDatabaseConnection } from '../databsemanager'; // Assuming this is the file with the previously defined methods.
-import { User, createUserObj } from './user'; // The User entity defined above.
+import { User, users, NewUser } from './user'; // The User entity defined above.
 
-    export async function getUser(email: string): Promise<User> {
-        const connection = await getDatabaseConnection();
-        const user = await connection.getRepository(User).findOne({ where: { email } });
+    export async function getUser(emailAdress: string): Promise<User> {
+        const db = await getDatabaseConnection();
+
+
+        const userRes: User[] = await db.select().from(users).where(eq(users.email, emailAdress));
         
-        if(user){
-            return user;
+
+        if(userRes.length>0){
+            return userRes[0];
         }
 
-        createUser(email, false, false);
+        insertUser(emailAdress, false);
+
+        const userRes2: User[] = await db.select().from(users).where(eq(users.email, emailAdress));
         
-        return user ? user : createUserObj(email, false, false);
+        return userRes2[0];
     }
 
-    export async function updateUserLastRequest(email: string, lastRequest: Date): Promise<void> {
+    export async function updateUserLastRequest(email: string, lastRequestDate: Date): Promise<void> {
         const connection = await getDatabaseConnection();
-        const userRepository = connection.getRepository(User);
-        await userRepository.update({ email }, { lastRequest });
+        await connection.update(users).set({lastRequest: lastRequestDate.toDateString()}).where(eq(users.email, email));
     }
 
-    export async function createUser(email: string, isAdmin = false, isBanned = false): Promise<User> {
+    export async function insertUser(email: string, isAdmin = false, lastRequestDate = Date.now()): Promise<NewUser> {
         const connection = await getDatabaseConnection();
-        const userRepository = connection.getRepository(User);
-        const user = userRepository.create({ email, isAdmin, isBanned });
-        return userRepository.save(user);
+        const newUser: NewUser = {email: email, isAdmin: isAdmin, lastRequest: lastRequestDate.toString()}
+        await connection.insert(users).values(newUser);
+        return newUser;
     }
 
-    export async function setIsBanned(email: string, isBanned: boolean): Promise<void> {
-        const connection = await getDatabaseConnection();
-        const userRepository = connection.getRepository(User);
-        await userRepository.update({ email }, { isBanned });
-    }
 
-    export async function setAdmin(email: string, isAdmin: boolean): Promise<void> {
-        const connection = await getDatabaseConnection();
-        const userRepository = connection.getRepository(User);
-        await userRepository.update({ email }, { isAdmin });
+    export async function setAdmin(email: string, isAdmin: boolean): Promise<boolean> {
+        try{
+            const connection = await getDatabaseConnection();
+            await connection.update(users).set({isAdmin: isAdmin});    
+        }catch(e){
+            return false;
+        }
+        return true;
     }
 
 

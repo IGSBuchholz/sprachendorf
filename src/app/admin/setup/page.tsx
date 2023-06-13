@@ -12,7 +12,15 @@ const variants: Variants = {
   exit: { opacity: 0, y: -20 },
 };
 
-export default function Setup() {
+
+export default function Setup(){
+
+  return (<></>)
+
+}
+
+function Setup_Old() {
+
   const [step, setStep] = useState(0);
   const [databaseType, setDatabaseType] = useState("");
   const [email, setEmail] = useState('');

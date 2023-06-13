@@ -1,13 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 
-@Entity('Configuration')
-export class Configuration {
-    @PrimaryGeneratedColumn()
-    id!: number;
-
-    @Column({ type: 'text', nullable: true })
-    option!: string;
-
-    @Column({ type: 'text', nullable: true })
-    value!: string;
-}
+export const users = pgTable('config', {
+  id: serial('id').primaryKey(),
+  key: text('key'),
+  value: text('value'),
+});

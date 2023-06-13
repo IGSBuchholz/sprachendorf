@@ -1,30 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn } from 'typeorm';
+import { boolean, date, pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+import { InferModel, eq, sql } from 'drizzle-orm';
 
-@Entity('UserInfo')
-export class User {
-    @PrimaryGeneratedColumn()
-    id!: number;
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  email: text('email').notNull(),
+  lastRequest: text('lastRequest'),
+  isAdmin: boolean('isAdmin'),
+});
 
-    @Column({ unique: true })
-    email!: string;
 
-    @Column({ default: false })
-    isAdmin!: boolean;
+export type User = InferModel<typeof users>;
 
-    @Column({ default: false })
-    isBanned!: boolean;
-
-    @UpdateDateColumn()
-    lastRequest!: Date;
-}
-
-export function createUserObj(email: string, isAdmin: boolean, isBanned: boolean): User{
-
-    const res = new User();
-    res.email = email;
-    res.isAdmin = isAdmin;
-    res.isBanned = isBanned;
-    
-    return res;
-
-}
+export type NewUser = InferModel<typeof users, 'insert'>;
