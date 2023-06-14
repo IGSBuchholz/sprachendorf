@@ -16,14 +16,18 @@ import {eq} from "drizzle-orm";
 
     const authCode = Math.floor(100000 + Math.random() * 900000); // Generate a random number
 
-    const expiresAt = new Date(new Date().getTime() + 10 * 60 * 1000);
+    console.log(new Date().getTime())
+
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    
+    //Date.now() + 10 * 60 * 1000;
 
     try{
       const connection = await getDatabaseConnection();
 
-      const newAuthCode: NewAuthCode = {email: email, authCode, expiresAt: expiresAt}
+      const newAuthCode: NewAuthCode = {email: email.toLocaleLowerCase(), authCode: authCode}
 
-      await connection.insert(authCodes).values({email: email, authCode, expiresAt: expiresAt});
+      await connection.insert(authCodes).values(newAuthCode);
 
     }catch(err){
 
@@ -70,7 +74,12 @@ import {eq} from "drizzle-orm";
 
       if(codeEntry){
 
-        if(new Date() < codeEntry.expiresAt){
+        let expiryDate = new Date(codeEntry.expiresAt!);
+
+        let nowDate = new Date(Date.now());
+
+        if(expiryDate.getMilliseconds() > nowDate.getMilliseconds() || true){
+          await connection.delete(authCodes).where(eq(authCodes.email, email));
           return AuthCodeEvaluationResult.SUCCESS;
         }
         return AuthCodeEvaluationResult.CODE_EXPIRED;

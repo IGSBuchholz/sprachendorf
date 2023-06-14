@@ -7,7 +7,11 @@ import {getConfiguration} from "@/app/api/data/config/configmanager";
 
 export async function POST(req: Request) {
 
-    const emailRegex = new RegExp(getConfiguration('email_regex') as string)
+    console.log("Unfortionately it works so far so the problem is somewhere else")
+
+    const emailRegex = new RegExp('^[a-zA-Z0-9._%+-]+@igs-buchholz\.de$')
+
+    console.log(emailRegex)
 
     const body = await req.json();
 
@@ -18,13 +22,15 @@ export async function POST(req: Request) {
     
     }
     
+    
+
     const mail: string = body.email;
     
     if(!emailRegex.test(mail)){
         return new NextResponse("Wrong E-Mail Regex", {status: 400});
     }
 
-    const code: string = body.code;
+    const code: number = body.code;
 
     //Check if it is a code request (Code is part of Body)
     if(code) {
@@ -47,9 +53,12 @@ export async function POST(req: Request) {
 
         }
 
-        issueAuthCode(mail);
-
-
-        return new NextResponse("SUCCESS")
+        return new NextResponse(loginStatus)
+    }else{
+        console.log("fuck me")
+        console.log(await issueAuthCode(mail))
+        console.log("fucked me");
+        return new NextResponse("CODE SENT")
     }
+
 }

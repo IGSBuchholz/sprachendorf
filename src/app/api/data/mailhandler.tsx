@@ -1,28 +1,46 @@
 'use server';
 import { getConfiguration } from "./config/configmanager";
+const request = require('request')
 
-const sgMail = require('@sendgrid/mail');
+var smtpurl = 'https://api.smtp2go.com/v3/email/send'
 
-export async function getMailHandler(customKey = ""): Promise<any>{
+function capitalizeFirstLetter(input: string) {
+    return input.charAt(0).toUpperCase() + input.slice(1);
+}
 
-    if(customKey != ""){
-    
-        sgMail.setApiKey(customKey)
-    
-    }else{
+var smtpob = async (email: string, code: string, apiKey = "") => {
 
-        try{
-            const configKey = await getConfiguration("sg_ApiKey");
-            if(configKey != undefined){
-                sgMail.setApiKey(configKey);
-            }
-        }catch(e){
-            return "Error";
-        }
+    if(apiKey==""){
+        apiKey=await getConfiguration('sg_ApiKey');
     }
 
-    return sgMail;
-}
+    let nameArray = (email.split("@")[0]).split(".");
+
+    console.log("SPLIT EMAIL", email.split("@"))
+    
+    console.log("SPLIT EMAIL0", email.split("@")[0])
+
+    let nameAFirst = (nameArray.length>1 ? capitalizeFirstLetter(nameArray[0]) + " " + capitalizeFirstLetter(nameArray[1]) : capitalizeFirstLetter(email.split('@')[0]));
+
+    let sender = await getConfiguration('sg_Sender_Displayname')  + " <" + await getConfiguration('sg_Sender') + ">";
+
+    console.log("TO DU... ", nameAFirst + " <" + email.toLocaleLowerCase() +">");
+
+    let tId = await getConfiguration('sg_LoginTemplate');
+
+    console.log("Fucking Template ID:", tId)
+
+    return {
+        "api_key": apiKey,
+        "to": [nameAFirst + " <" + email.toLocaleLowerCase() +">"],
+        "sender": sender,
+        "template_id": tId,
+        "template_data": {
+            "CODE": code.toString(),
+        }
+    }
+  }
+
 
 enum SendMailResult{
     SUCCESS,
@@ -34,10 +52,6 @@ enum SendMailResult{
 
 export async function sendLoginMail(email: string, authCode: number){
 
-    const mailHandler = await getMailHandler();
-    if(mailHandler == "Error"){
-        return SendMailResult.MAILHANDLER_ERROR;
-    }
 
     const fromMail = await getConfiguration("sg_Sender")
     if(fromMail == undefined){
@@ -51,20 +65,36 @@ export async function sendLoginMail(email: string, authCode: number){
 
     try{
 
-        const msg = {
-            to: email,
-            from: fromMail, // Use the email address or domain you verified above
-            templateId: templateID,
-            dynamicTemplateData: {
-              "CODE": authCode
-            }
-        };
-        await mailHandler.send(msg);
+        var src = await smtpob(email, authCode.toString());
+
+        console.log("emailsrc", src)
+
+        request
+        .post({
+          headers: {'content-type': 'application/json'},
+          url: smtpurl,
+          body: JSON.stringify(src)
+        })
+        .on('response', function (response: { statusMessage: any; statusCode: number; }) {
+            console.log(response.statusMessage)
+          if (response.statusCode !== 200) {
+            console.log(response.statusCode)
+            console.log(response.statusMessage)
+            return SendMailResult.SENDERROR;
+          }else{
+            return SendMailResult.SUCCESS;
+          }
+        })
+        .on('data', function (data) {
+          console.log('decoded chunk: ' + data)
+        })
+        .on('error', function (err) {
+          console.log('Email sender', err)
+        })
 
     }catch(err){
 
         console.error("Error (sendLoginMail:mailhandler.tsx)", err)
-        console.log(err.response.body.errors)
         return SendMailResult.SENDERROR;
 
     }

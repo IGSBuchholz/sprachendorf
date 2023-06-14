@@ -10,12 +10,14 @@ let dbCon: PostgresJsDatabase;
 
 export async function saveDatabaseConfiguration(connectionOptions: any): Promise<void> {
     console.warn("WRITING DATABASE CONFIGURATION FOR SOME REASON")
-    fs.writeFileSync(configFilePath, JSON.stringify(connectionOptions, null, 2));
+    fs.writeFileSync(configFilePath, connectionOptions);
 }
 
-export async function getDatabaseConfiguration(): Promise<any> {
-    const configFileContent = fs.readFileSync(configFilePath, 'utf8');
-    return JSON.parse(configFileContent);
+export async function getDatabaseConfiguration(): Promise<string> {
+    //const configFileContent = fs.readFileSync(configFilePath, 'utf8');
+    //console.log("AAAAHHH FILE CONTENT", configFileContent)
+    //return configFileContent;
+    return process.env.DATABASE_URI as string;
 }
 
 export async function getDatabaseConnection(connectionString?: any): Promise<PostgresJsDatabase> {
@@ -25,9 +27,9 @@ export async function getDatabaseConnection(connectionString?: any): Promise<Pos
     console.log("test debug message:", connectionStringInitially)
 
     if(!connectionStringInitially){
-        if (fs.existsSync(configFilePath)) {
+        try{
             connectionString = await getDatabaseConfiguration();
-        } else {
+        }catch(ex){
             throw new Error('No database configuration file found.');
         }
     }
