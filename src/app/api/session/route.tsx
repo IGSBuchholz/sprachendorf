@@ -1,7 +1,11 @@
-import { NextRequest } from "next/server";
-import { verifySession } from "../data/sessionmanager";
+import {NextResponse} from "next/server";
 
+export async function GET(req, NextRequest) {
+    if (req.user) {
+        // The user is logged in
+        return new NextResponse( {'status': 'LOGGED_IN', 'user': req.user}, { status: 200 });
+    }
 
-export async function GET(request: NextRequest){
-
+    // The user is not logged in
+    return new NextResponse('Please log in', { status: 401 });
 }

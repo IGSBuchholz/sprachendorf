@@ -17,6 +17,7 @@ export async function getDatabaseConfiguration(): Promise<string> {
     //const configFileContent = fs.readFileSync(configFilePath, 'utf8');
     //console.log("AAAAHHH FILE CONTENT", configFileContent)
     //return configFileContent;
+    console.log(process.env.DATABASE_URI)
     return process.env.DATABASE_URI as string;
 }
 

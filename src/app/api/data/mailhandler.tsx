@@ -8,23 +8,26 @@ function capitalizeFirstLetter(input: string) {
     return input.charAt(0).toUpperCase() + input.slice(1);
 }
 
+export async function getNameFromEmail(inputEmail: string){
+
+    let nameArray = (inputEmail.split("@")[0]).split(".");
+
+    let nameAFirst = (nameArray.length>1 ? capitalizeFirstLetter(nameArray[0]) + " " + capitalizeFirstLetter(nameArray[1]) : capitalizeFirstLetter(inputEmail.split('@')[0]));
+
+    return nameAFirst;
+
+}
+
 var smtpob = async (email: string, code: string, apiKey = "") => {
 
     if(apiKey==""){
         apiKey=await getConfiguration('sg_ApiKey');
     }
 
-    let nameArray = (email.split("@")[0]).split(".");
-
-    console.log("SPLIT EMAIL", email.split("@"))
-    
-    console.log("SPLIT EMAIL0", email.split("@")[0])
-
-    let nameAFirst = (nameArray.length>1 ? capitalizeFirstLetter(nameArray[0]) + " " + capitalizeFirstLetter(nameArray[1]) : capitalizeFirstLetter(email.split('@')[0]));
+    const usersName = await getNameFromEmail(email);
 
     let sender = await getConfiguration('sg_Sender_Displayname')  + " <" + await getConfiguration('sg_Sender') + ">";
 
-    console.log("TO DU... ", nameAFirst + " <" + email.toLocaleLowerCase() +">");
 
     let tId = await getConfiguration('sg_LoginTemplate');
 
@@ -32,7 +35,7 @@ var smtpob = async (email: string, code: string, apiKey = "") => {
 
     return {
         "api_key": apiKey,
-        "to": [nameAFirst + " <" + email.toLocaleLowerCase() +">"],
+        "to": [usersName + " <" + email.toLocaleLowerCase() +">"],
         "sender": sender,
         "template_id": tId,
         "template_data": {

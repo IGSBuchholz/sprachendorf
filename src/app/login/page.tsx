@@ -1,7 +1,8 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
 import React from 'react';
+import {redirect, useRouter} from "next/navigation";
 
 const variants: Variants = {
   initial: { opacity: 0, y: 20 },
@@ -9,10 +10,29 @@ const variants: Variants = {
   exit: { opacity: 0, y: -20 },
 };
 
+export async function getServerSideProps(context) {
+  const { user } = context.res.locals;
+
+  console.log(user)
+
+  if(user){
+    return {
+      redirect: {
+        destination: '/dashboard',
+        permanent: false,
+      },
+    };
+  }
+
+}
+
+
 export default function Home() {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [showCodeInput, setShowCodeInput] = useState(false);
+  const router = useRouter();
+
 
   const codeInputRefs = Array.from({ length: 6 }, () => React.createRef<HTMLInputElement>());
 
@@ -64,8 +84,9 @@ export default function Home() {
       body: bodyContent, // body data type must match "Content-Type" header
     });
 
-    console.log(response);
-
+    if(response.status==200){
+      router.push('/home');
+    }
   };
 
   const handleGoBack = () => {

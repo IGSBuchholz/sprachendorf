@@ -4,6 +4,9 @@ import {createToken, issueSession} from "../data/sessionmanager";
 import { evaluateAuthCode, AuthCodeEvaluationResult } from "../data/authcode/authcodemanager";
 import { issueAuthCode, AuthCodeIssueingResult } from '../data/authcode/authcodemanager';
 import {getConfiguration} from "@/app/api/data/config/configmanager";
+import {getUser} from "@/app/api/data/user/usermanager";
+import {User} from "@/app/api/data/user/user";
+import {getNameFromEmail} from "@/app/api/data/mailhandler";
 
 export async function POST(req: Request) {
 
@@ -15,18 +18,16 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
-    if(!body.email){
+    if(!body || !body.email){
 
         console.log("Returning Error on Router () because no E-Mail provided")
         return new NextResponse("No Email Provided", {status: 204});        
     
     }
-    
-    
 
     const mail: string = body.email;
     
-    if(!emailRegex.test(mail)){
+    if(!mail || !emailRegex.test(mail)){
         return new NextResponse("Wrong E-Mail Regex", {status: 400});
     }
 
@@ -41,7 +42,15 @@ export async function POST(req: Request) {
 
         if (loginStatus == AuthCodeEvaluationResult.SUCCESS) {
 
-            const token = createToken({ id: user.id, email: user.email })
+            const userData: User = await getUser(mail.toLocaleLowerCase());
+
+            const token = await createToken(
+                {
+                    id: userData.email,
+                    email: userData.email,
+                    isAdmin: userData.isAdmin,
+                    name: await getNameFromEmail(userData.email as string)
+                });
 
             // Set the token as a cookie
             return new NextResponse("User Logged In", {
@@ -50,15 +59,14 @@ export async function POST(req: Request) {
                     'Set-Cookie': `token=${token}; Path=/; HttpOnly; SameSite=Lax`,
                 },
             });
-
         }
 
         return new NextResponse(loginStatus)
     }else{
-        console.log("fuck me")
+        console.log("fuck")
         console.log(await issueAuthCode(mail))
-        console.log("fucked me");
-        return new NextResponse("CODE SENT")
+        console.log("fucked");
+        return new NextResponse("CODE SENT", { status: 199 })
     }
 
 }
