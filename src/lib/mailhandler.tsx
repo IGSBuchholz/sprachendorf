@@ -66,10 +66,6 @@ export async function sendLoginMail(email: string, authCode: number){
         return SendMailResult.TEMPLATE_UNKNOWN;
     }
 
-    if(true){
-      return SendMailResult.SUCCESS;
-    }
-
     try{
 
         var src = await smtpob(email, authCode.toString());

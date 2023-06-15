@@ -13,9 +13,9 @@ const withAuth = (WrappedComponent) => {
 
         const verifyLogin = async () => {
             const response = await fetch('/api/session'); // replace with your API endpoint
-            const data = await response.json();
-
+            console.log(response.status)
             if (response.status == 200) {
+                const data = await response.json();
                 console.log(data.user);
                 setUser(data.user);
             } else {
