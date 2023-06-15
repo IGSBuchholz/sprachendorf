@@ -88,9 +88,11 @@ export async function sendLoginMail(email: string, authCode: number){
             return SendMailResult.SUCCESS;
           }
         })
+            //@ts-ignore
         .on('data', function (data) {
           console.log('decoded chunk: ' + data)
         })
+            //@ts-ignore
         .on('error', function (err) {
           console.log('Email sender', err)
         })

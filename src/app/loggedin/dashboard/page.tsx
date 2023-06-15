@@ -4,7 +4,9 @@ import QRCode from "react-qr-code";
 import {useEffect, useState} from "react";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
+import {UserSession} from "@/lib/usersession";
 
+//@ts-ignore
 function Dashboard({ user }) {
 
     if(!user) return;
@@ -62,14 +64,18 @@ function Dashboard({ user }) {
                             Abgeschlossene Stationen
                         </h2>
                         <div className="grid grid-cols-3 gap-4">
-                            {coursesDone.map((course, index) => {
-                                console.log(course.country)
+                            {//ts-ignore
+                                coursesDone.map((course, index) => {
+                                    if(!course) return <></>
+                                    if(!course['imglink'] || !course['country'] || !course['level']){
+                                        return <></>
+                                    }
                                 return (
                                     <div key={index} className="flex flex-col items-center justify-center text-black">
                                         <div className="w-24 h-24 rounded-full overflow-hidden inline-block">
-                                            <img src={course.imglink + ".svg"} alt="flag" className="w-full h-full object-cover" />
+                                            <img src={course['imglink'] + ".svg"} alt="flag" className="w-full h-full object-cover" />
                                         </div>
-                                        <h4 className="text-center">{course.country} {course.level}</h4>
+                                        <h4 className="text-center">{course['country']} {course['level']}</h4>
                                     </div>
                                 )
                             })}

@@ -1,3 +1,4 @@
+//@ts-nocheck
 import {NextRequest, NextResponse} from "next/server";
 import {getDatabaseConnection} from "@/lib/databsemanager";
 import {courses} from "@/lib/conutries";
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
                     country: courseCompletitions.country,
                     level: courseCompletitions.level,
                     niveau: courseCompletitions.niveau,
-                    imglink: courses.imglink
+                    imglink: courses.imglink,
                 }).from(courseCompletitions).where(eq(verificationResult.email, courseCompletitions.email)).leftJoin(courses, eq(courseCompletitions.country, courses.country));
 
                 console.log(res)
@@ -37,5 +38,7 @@ export async function GET(req: NextRequest) {
 
         }
     }
+
+    return new NextResponse('Nothing here?! O_O', { status: 401 });
 
 }

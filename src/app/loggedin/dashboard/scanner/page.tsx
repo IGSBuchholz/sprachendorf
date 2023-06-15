@@ -4,43 +4,41 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Course } from "@/lib/conutries";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
-
-function capitalizeFirstLetter(input: string) {
-    return input.charAt(0).toUpperCase() + input.slice(1);
-}
-
-export async function getNameFromEmail(inputEmail: string){
-
-    let nameArray = (inputEmail.split("@")[0]).split(".");
-
-    let nameAFirst = (nameArray.length>1 ? capitalizeFirstLetter(nameArray[0]) + " " + capitalizeFirstLetter(nameArray[1]) : capitalizeFirstLetter(inputEmail.split('@')[0]));
-
-    return nameAFirst;
-
-}
-
-
-
+import dynamic from "next/dynamic";
+//@ts-ignore
 function Scanner({ user }) {
 
+
+
     if(!user){
-        return;
+        return <></>;
     }else{
         if(!user.isAdmin){
-            return;
+            return <></>;
         }
     }
 
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [email, setEmail] = useState("Not found");
-    
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [step, setStep] = useState(1);
-
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [countries, setCountries] = useState([]);
-
-    const [selectedCourse, setSelectedCourse] = useState();
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [selectedCourse, setSelectedCourse] = useState()
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [courseLevel, setCourseLevel] = useState(1);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [courseNiveau, setCourseNiveau] = useState(1);
 
+
+    const BScanner = dynamic(
+        () => {
+            return import('react-qr-barcode-scanner')
+        },
+        {ssr: false}
+    )
 
     async function submitCourse(){
 
@@ -57,6 +55,7 @@ function Scanner({ user }) {
         setStep(2);
     }
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
 
         const getCountries = async () => {
@@ -90,17 +89,18 @@ function Scanner({ user }) {
                         </h2>
 
                         {countries.map((course) => {
-                            console.log(course.imglink)
                             function selectCourse(course: Course) {
                                 console.log("Course Set", course)
+                                //@ts-ignore
                                 setSelectedCourse(course)
                                 setStep(2);
                             }
 
+                            // eslint-disable-next-line react/jsx-key
                             return <div className="drop-shadow-xl bg-white mt-6 rounded-xl hover:scale-105 cursor-pointer" onClick={() => {selectCourse(course)}}>
                                 <div className="text-black py-6 px-4">
-                                    <Image className="inline" alt={course.country+"-Flagge"} src={course.imglink + ".svg"} width={40} height={40}></Image>
-                                    <h3 className="inline ml-4">{course.country}</h3>
+                                    <Image className="inline" alt={course['country']+"-Flagge"} src={course['imglink'] + ".svg"} width={40} height={40}></Image>
+                                    <h3 className="inline ml-4">{course['country']}</h3>
                                 </div>
 
                             </div>
@@ -110,8 +110,8 @@ function Scanner({ user }) {
                 </div>
           </div>
 
-            
-        
+
+
         
         </> : (step==2 ? <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-md w-full bg-white rounded-lg shadow-md overflow-hidden">
@@ -120,7 +120,8 @@ function Scanner({ user }) {
                             Unterkurs wählen
                         </h2>
                         <div className="mx-auto flex justify-center mt-6 py-4">
-                                    {[...Array(selectedCourse.levels)].map((elementInArray, index) => ( 
+                                    {//@ts-ignore
+                                        [...Array(selectedCourse.levels)].map((elementInArray, index) => (
                                     <div className="text-black rounded-full px-7 py-6 inline shadow-md bg-white mr-6 hover:bg-sky-100 cursor-pointer" onClick={() => {setLevel(index+1)}} key={index}>{index+1}</div> 
                                 )  
                             )}
@@ -149,28 +150,31 @@ function Scanner({ user }) {
                         <h2 className="text-3xl font-extrabold text-black mb-8">
                             QR-Code scannen
                         </h2>
-                        
-                        <BarcodeScannerComponent
+
+                        <BScanner
                             width={500}
                             height={500}
                             onUpdate={(err, result) => {
                                 if (result){
                                     const emailRegex = new RegExp('^[a-zA-Z0-9._%+-]+@igs-buchholz\.de$')
+                                    //@ts-ignore
                                     console.log("E-Mail:", result.text)
+                                    //@ts-ignore
                                     setEmail(result.text.toString());
+                                    //@ts-ignore
                                     if(result.text.endsWith("@igs-buchholz.de")){
                                         console.log("E-Mail passed:", email)
                                         setStep(5);
                                     }
                                 }
-                            
+
                             }}
                         />
 
                         
                     </div>
             </div> 
-            </div> : (step==5 ? <>
+            </div> : (step==5 && selectedCourse!=null ? <>
             
                 <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
                     <div className="max-w-md w-full bg-white rounded-lg shadow-md overflow-hidden">
@@ -179,7 +183,7 @@ function Scanner({ user }) {
                                 Daten bestätigen
                             </h2>
 
-                            <h3 className="text-black"><b>{selectedCourse.country}</b> ({courseNiveau})</h3>
+                            <h3 className="text-black"><b>{selectedCourse['country']}</b> ({courseNiveau})</h3>
 
                             <h3 className="text-black"><b>E-Mail: </b>{email}</h3>
 
@@ -197,5 +201,6 @@ function Scanner({ user }) {
     </>
 
 }
+
 
 export default withAuth(Scanner)

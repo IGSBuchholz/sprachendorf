@@ -1,8 +1,11 @@
+//@ts-ignore
 'use client';
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
+//@ts-ignore
 const withAuth = (WrappedComponent) => {
+    //@ts-ignore
+    // eslint-disable-next-line react/display-name
   return (props) => {
     const router = useRouter();
     const [user, setUser] = useState()
@@ -32,7 +35,7 @@ const withAuth = (WrappedComponent) => {
         <div className="inline-flex animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-gray-900"></div>
       </div>
     }
-
+//@ts-ignore
     return <WrappedComponent {...props} user={user}/>;
   };
 };

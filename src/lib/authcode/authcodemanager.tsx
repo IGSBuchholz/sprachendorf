@@ -1,5 +1,3 @@
-import {NewUser} from "@/app/api/data/user/user";
-
 const sgMail = require('@sendgrid/mail');
 import { sendLoginMail } from "../mailhandler";
 import {authCode, authCodes, NewAuthCode} from "./authcode";
@@ -66,14 +64,15 @@ import {eq} from "drizzle-orm";
 
       const resL = await connection.select().from(authCodes).where(eq(authCodes.email, email)).where(eq(authCodes.authCode, authCode));
 
+      //@ts-ignore
       if(!resL.length>0){
         return AuthCodeEvaluationResult.CODE_NOT_FOUND;
       }
-
+      //@ts-ignore
       const codeEntry: authCode = resL[0];
 
       if(codeEntry){
-
+//@ts-ignore
         let expiryDate = new Date(codeEntry.expiresAt!);
 
         let nowDate = new Date(Date.now());

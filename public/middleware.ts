@@ -1,6 +1,5 @@
 'use server';
 import { parse } from 'cookie'
-import { verifyToken } from './lib/sessionmanager'
 import {NextRequest, NextResponse} from "next/server";
 import { cookies } from 'next/headers'
 // This function can be marked `async` if using `await` inside

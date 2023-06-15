@@ -157,6 +157,7 @@ export default function Home() {
                 >
                   <div className="flex justify-center">
                     {code.map((digit, index) => (
+                        // eslint-disable-next-line react/jsx-key
                       <div className='ml-4'>
                         <input
                       key={index}

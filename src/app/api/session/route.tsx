@@ -1,8 +1,8 @@
 import { parse } from 'cookie'
-import {NextResponse} from "next/server";
+import {NextRequest, NextResponse} from "next/server";
 import { verifyToken } from "../../../lib/sessionmanager";
 
-export async function GET(req, NextRequest) {
+export async function GET(req: NextRequest) {
     const cookies = parse(req.cookies.toString() || '')
     if(cookies){
         const token = cookies.token
