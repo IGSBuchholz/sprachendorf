@@ -16,8 +16,8 @@ const withAuth = (WrappedComponent) => {
             const data = await response.json();
 
             if (response.status == 200) {
-                console.log(data);
-                setUser(data);
+                console.log(data.user);
+                setUser(data.user);
             } else {
                 router.replace("/login"); // replace with your login route
             }
