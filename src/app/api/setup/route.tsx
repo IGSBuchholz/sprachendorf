@@ -7,9 +7,9 @@ import { config } from 'process';
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-import { issueSession } from '../data/sessionmanager';
-import { getDatabaseConfiguration, getDatabaseConnection, saveDatabaseConfiguration } from '../data/databsemanager';
-import { getConfiguration } from '../data/config/configmanager';
+import { createToken } from '../../../lib/sessionmanager';
+import { getDatabaseConfiguration, getDatabaseConnection, saveDatabaseConfiguration } from '../../../lib/databsemanager';
+import { getConfiguration } from '../../../lib/config/configmanager';
 
 
 enum ConfigValue {
@@ -122,7 +122,7 @@ export async function POST(req: Request) {
                 
                 const authToken = jwt.sign({ email: body.email }, process.env.SESSIONKEY as string);
 
-                issueSession(body.name, true);
+                //createToken(body.name, true);
 
                 return new NextResponse()
 

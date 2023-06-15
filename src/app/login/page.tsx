@@ -10,22 +10,6 @@ const variants: Variants = {
   exit: { opacity: 0, y: -20 },
 };
 
-export async function getServerSideProps(context) {
-  const { user } = context.res.locals;
-
-  console.log(user)
-
-  if(user){
-    return {
-      redirect: {
-        destination: '/dashboard',
-        permanent: false,
-      },
-    };
-  }
-
-}
-
 
 export default function Home() {
   const [email, setEmail] = useState('');
@@ -33,6 +17,23 @@ export default function Home() {
   const [showCodeInput, setShowCodeInput] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+
+    const getUser = async () => {
+
+      const response = await fetch("/api/session", {
+        method: "GET", // *GET, POST, PUT, DELETE, etc.
+      });
+
+      if(response.status==200){
+        router.push("/loggedin/dashboard")
+      }
+
+    }
+
+    getUser()
+
+  }, [])
 
   const codeInputRefs = Array.from({ length: 6 }, () => React.createRef<HTMLInputElement>());
 
@@ -85,7 +86,7 @@ export default function Home() {
     });
 
     if(response.status==200){
-      router.push('/home');
+      router.push('/loggedin/dashboard');
     }
   };
 

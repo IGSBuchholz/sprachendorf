@@ -1,5 +1,6 @@
+'use server';
 import { parse } from 'cookie'
-import { verifyToken } from './app/api/data/sessionmanager'
+import { verifyToken } from './lib/sessionmanager'
 import {NextRequest, NextResponse} from "next/server";
 import { cookies } from 'next/headers'
 // This function can be marked `async` if using `await` inside
@@ -7,14 +8,15 @@ export async function middleware(req: NextRequest) {
      const cookies = parse(req.cookies.toString() || '')
      const token = cookies.token
 
-     let user = null;
-     if (token) {
-         user = await verifyToken(token)
-         if (user) {
-             req.user = user
-         }
-     }
-     console.log(user)
+
+     //let user = null;
+     //if (token) {
+     //    user = await verifyToken(token)
+     //    if (user) {
+     //        req.user = user
+     //    }
+     //}
+     //console.log(user)
 
      // console.log(user)
      //

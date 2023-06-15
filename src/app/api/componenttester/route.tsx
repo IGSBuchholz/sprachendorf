@@ -1,14 +1,7 @@
-'use server'
-import { NextRequest, NextResponse } from "next/server";
-import { issueSession } from "../data/sessionmanager";
-import { evaluateAuthCode, AuthCodeEvaluationResult } from "../data/authcode/authcodemanager";
-import { issueAuthCode, AuthCodeIssueingResult } from '../data/authcode/authcodemanager';
-import {getUser, insertUser} from '../data/user/usermanager'
-import {saveDatabaseConfiguration, getDatabaseConfiguration, getDatabaseConnection} from '../data/databsemanager'
-import {getConfiguration, updateConfiguration} from '../data/config/configmanager'
-import { sendLoginMail } from '../data/mailhandler'
+import { verifyToken } from "@/lib/sessionmanager";
+import { NextResponse } from "next/server"
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
 
     console.log("test")
 
@@ -26,10 +19,15 @@ export async function POST(req: Request) {
     // console.log(await sendLoginMail('constantin.debertin@igs-buchholz.de', 123))
     // const res = await issueAuthCode('constantin.debertin@igs-buchholz.de');
 
-    const res = await evaluateAuthCode('constantin.debertin@igs-buchholz.de', 601986);
+    //const res = await evaluateAuthCode('constantin.debertin@igs-buchholz.de', 601986);
 
-    console.log(res);
+    //const res = await getSessionKey();    
+    //const res2 = await getSessionKey();
 
+    const res = await verifyToken()
+
+    console.log("FUCKING RESULT", res);
+    
     return new NextResponse()
 
 }

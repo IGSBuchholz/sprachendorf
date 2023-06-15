@@ -1,12 +1,12 @@
 'use server'
 import { NextRequest, NextResponse } from "next/server";
-import {createToken, issueSession} from "../data/sessionmanager";
-import { evaluateAuthCode, AuthCodeEvaluationResult } from "../data/authcode/authcodemanager";
-import { issueAuthCode, AuthCodeIssueingResult } from '../data/authcode/authcodemanager';
-import {getConfiguration} from "@/app/api/data/config/configmanager";
-import {getUser} from "@/app/api/data/user/usermanager";
-import {User} from "@/app/api/data/user/user";
-import {getNameFromEmail} from "@/app/api/data/mailhandler";
+import {createToken} from "../../../lib/sessionmanager";
+import { evaluateAuthCode, AuthCodeEvaluationResult } from "../../../lib/authcode/authcodemanager";
+import { issueAuthCode, AuthCodeIssueingResult } from '../../../lib/authcode/authcodemanager';
+import {getConfiguration} from "../../../lib/config/configmanager";
+import {getUser} from "../../../lib/user/usermanager";
+import {User} from "../../../lib/user/user";
+import {getNameFromEmail} from "../../../lib/mailhandler";
 
 export async function POST(req: Request) {
 
@@ -52,6 +52,8 @@ export async function POST(req: Request) {
                     name: await getNameFromEmail(userData.email as string)
                 });
 
+            console.log("Mfing token", token)
+
             // Set the token as a cookie
             return new NextResponse("User Logged In", {
                 status: 200,
@@ -66,7 +68,7 @@ export async function POST(req: Request) {
         console.log("fuck")
         console.log(await issueAuthCode(mail))
         console.log("fucked");
-        return new NextResponse("CODE SENT", { status: 199 })
+        return new NextResponse("CODE SENT", { status: 201 })
     }
 
 }
