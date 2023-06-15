@@ -17,6 +17,8 @@ export default function Home() {
   const [showCodeInput, setShowCodeInput] = useState(false);
   const router = useRouter();
 
+  const [error, setError] = useState("")
+
   useEffect(() => {
 
     const getUser = async () => {
@@ -117,6 +119,7 @@ export default function Home() {
                     value={email}
                     onChange={handleEmailChange}
                     disabled={showCodeInput}
+                    pattern={'^[a-zA-Z0-9._%+-]+@igs-buchholz\.de$'}
                     className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                     placeholder="vorname.nachname@igs-buchholz.de"
                   />
