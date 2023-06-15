@@ -30,15 +30,26 @@
     "load-json-file": "^7.0.1",
     "mongodb": "^5.5.0",
     "mysql": "^2.18.1",
+<<<<<<< Updated upstream
     "next": "13.4.5",
+=======
+    "next": "^13.4.5",
+>>>>>>> Stashed changes
     "next-themes": "^0.2.1",
     "nodemailer": "^6.9.3",
     "pg": "^8.10.0",
     "postcss": "8.4.23",
+<<<<<<< Updated upstream
     "postgres": "^3.3.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+=======
+    "qrcode.react": "^3.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+>>>>>>> Stashed changes
     "react-intersection-observer": "^9.4.3",
+    "react-qr-code": "^2.0.11",
     "react-responsive-carousel": "^3.2.23",
     "react-scroll-trigger": "^0.6.14",
     "request": "^2.88.2",
@@ -49,8 +60,17 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
+<<<<<<< Updated upstream
     "@types/cookie": "^0.5.1",
     "@types/jsonwebtoken": "^9.0.2",
     "drizzle-kit": "^0.18.1"
   }
+=======
+    "@types/jsonwebtoken": "^9.0.2"
+  },
+  "description": "First, run the development server:",
+  "main": "next.config.js",
+  "author": "",
+  "license": "ISC"
+>>>>>>> Stashed changes
 }
