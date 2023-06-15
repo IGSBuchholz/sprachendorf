@@ -93,7 +93,11 @@ export default function Home() {
   };
 
   const handleGoBack = () => {
-    setShowCodeInput(false);
+    if(showCodeInput){
+      setShowCodeInput(false);
+    }else{
+      router.push('/')
+    }
   };
 
   return (
