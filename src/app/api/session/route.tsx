@@ -16,7 +16,7 @@ export async function GET(req, NextRequest) {
 
         if(verificationResult){
             // The user is logged in
-            return new NextResponse( {'status': 'LOGGED_IN', 'user': verificationResult}, { status: 200 });
+            return new NextResponse( JSON.stringify({'status': 'LOGGED_IN', 'user': verificationResult}), { status: 200 });
         }
         return new NextResponse('Token not valid', { status: 401 });
 
