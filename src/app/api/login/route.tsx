@@ -46,14 +46,14 @@ export async function POST(req: Request) {
 
             
 
-            if(userData){
+            if(!userData){
 
                 const token = await createToken(
                     {
                         id: 999,
                         email: mail,
                         isAdmin: false,
-                        name: await getNameFromEmail(userData.email as string)
+                        name: await getNameFromEmail(mail as string)
                     });
     
                 console.log("Mfing token from someone who has no user account", token)
