@@ -10,7 +10,7 @@ import {eq} from "drizzle-orm";
 //     return configurationRepository.save(configuration);
 // }
 
-let configCache = new Map();
+export let configCache = new Map();
 
 export async function getConfiguration(key: string): Promise<any | undefined> {
     if(!configCache.has(key)){
