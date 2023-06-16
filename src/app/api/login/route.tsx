@@ -42,25 +42,52 @@ export async function POST(req: Request) {
 
         if (loginStatus == AuthCodeEvaluationResult.SUCCESS) {
 
-            const userData: User = await getUser(mail.toLocaleLowerCase());
+            const userData: User | undefined = await getUser(mail.toLocaleLowerCase());
 
-            const token = await createToken(
-                {
-                    id: userData.email,
-                    email: userData.email,
-                    isAdmin: userData.isAdmin,
-                    name: await getNameFromEmail(userData.email as string)
+            
+
+            if(userData){
+
+                const token = await createToken(
+                    {
+                        id: 999,
+                        email: mail,
+                        isAdmin: false,
+                        name: await getNameFromEmail(userData.email as string)
+                    });
+    
+                console.log("Mfing token from someone who has no user account", token)
+    
+                // Set the token as a cookie
+                return new NextResponse("User Logged In", {
+                    status: 200,
+                    headers: {
+                        'Set-Cookie': `token=${token}; Path=/; HttpOnly; SameSite=Lax`,
+                    },
                 });
 
-            console.log("Mfing token", token)
+            }else{
 
-            // Set the token as a cookie
-            return new NextResponse("User Logged In", {
-                status: 200,
-                headers: {
-                    'Set-Cookie': `token=${token}; Path=/; HttpOnly; SameSite=Lax`,
-                },
-            });
+                const token = await createToken(
+                    {
+                        id: userData.email,
+                        email: userData.email,
+                        isAdmin: userData.isAdmin,
+                        name: await getNameFromEmail(userData.email as string)
+                    });
+    
+                console.log("Mfing token", token)
+    
+                // Set the token as a cookie
+                return new NextResponse("User Logged In", {
+                    status: 200,
+                    headers: {
+                        'Set-Cookie': `token=${token}; Path=/; HttpOnly; SameSite=Lax`,
+                    },
+                });
+
+            }
+
         }
 
         return new NextResponse(loginStatus)

@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm';
 import { getDatabaseConnection } from '../databsemanager'; // Assuming this is the file with the previously defined methods.
 import { User, users, NewUser } from './user'; // The User entity defined above.
 
-    export async function getUser(emailAdress: string): Promise<User> {
+    export async function getUser(emailAdress: string): Promise<User | undefined> {
         const db = await getDatabaseConnection();
 
 
@@ -12,12 +12,8 @@ import { User, users, NewUser } from './user'; // The User entity defined above.
         if(userRes.length>0){
             return userRes[0];
         }
-
-        insertUser(emailAdress, false);
-
-        const userRes2: User[] = await db.select().from(users).where(eq(users.email, emailAdress));
         
-        return userRes2[0];
+        return undefined;
     }
 
     export async function updateUserLastRequest(email: string, lastRequestDate: Date): Promise<void> {
