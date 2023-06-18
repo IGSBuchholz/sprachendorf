@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 //@ts-ignore
-const withAuth = (WrappedComponent) => {
+const withAuth = (WrappedComponent, needAdmin = false) => {
     //@ts-ignore
     // eslint-disable-next-line react/display-name
   return (props) => {
     const router = useRouter();
     const [user, setUser] = useState()
-    const [isVerifying, setIsVerifying] = useState()
+    const [isVerifying, setIsVerifying] = useState(true)
 
 
     useEffect(() => {
@@ -21,6 +21,12 @@ const withAuth = (WrappedComponent) => {
                 const data = await response.json();
                 console.log(data.user);
                 setUser(data.user);
+                setIsVerifying(false);
+                if(needAdmin){
+                    if(!data.user.isAdmin){
+                        router.replace('/loggedin/dashboard')
+                    }
+                }
             } else {
                 router.replace("/login"); // replace with your login route
             }
@@ -31,9 +37,9 @@ const withAuth = (WrappedComponent) => {
     }, [router])
 
     if(isVerifying){
-        return <div className="flex justify-center items-center h-screen">
-        <div className="inline-flex animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-gray-900"></div>
-      </div>
+        return <div className="flex justify-center items-center h-screen bg-white">
+            <div className="inline-flex animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-gray-900"></div>
+        </div>
     }
 //@ts-ignore
     return <WrappedComponent {...props} user={user}/>;

@@ -7,6 +7,7 @@ import { redirect, useRouter } from 'next/navigation';
 import { Carousel } from 'react-responsive-carousel'
 import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import Image from 'next/image';
+import Link from "next/link";
 
 const Home: React.FC = () => {
     
@@ -62,16 +63,14 @@ const Home: React.FC = () => {
           </motion.p>
 
           <div className="mt-8 flex justify-center">
-            <motion.button
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
-              type="button"
-              onClick={() => {router.push('/login')}}
               className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-black bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              Loslegen
-            </motion.button>
+              <Link href={'/login'}>Loslegen</Link>
+            </motion.div>
 
           </div>
           
