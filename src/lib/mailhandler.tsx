@@ -71,7 +71,7 @@ export async function sendLoginMail(email: string, authCode: number){
 
         console.log("emailsrc", src)
 
-        request
+        await request
         .post({
           headers: {'content-type': 'application/json'},
           url: smtpurl,
