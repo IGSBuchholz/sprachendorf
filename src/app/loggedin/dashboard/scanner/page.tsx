@@ -116,7 +116,7 @@ function Scanner({ user }) {
                                 >
                                     <div className="drop-shadow-xl bg-white mt-6 rounded-xl hover:scale-105 cursor-pointer" onClick={() => {selectCourse(course)}}>
                                         <div className="text-black py-6 px-4">
-                                            <Image className="inline" alt={course['country']+"-Flagge"} src={course['imglink'] + ".svg"} width={40} height={40}></Image>
+                                            <Image className="inline" alt={course['country']+"-Flagge"} src={course['imglink']} width={40} height={40}></Image>
                                             <h3 className="inline ml-4">{course['country']}</h3>
                                         </div>
 

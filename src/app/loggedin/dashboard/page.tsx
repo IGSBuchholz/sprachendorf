@@ -89,7 +89,7 @@ function Dashboard({ user }) {
                                     >
                                     <div className="flex flex-col items-center justify-center text-black">
                                         <div className="w-24 h-24 rounded-full overflow-hidden inline-block">
-                                            <img src={course['imglink'] + ".svg"} alt="flag" className="w-full h-full object-cover" />
+                                            <img src={course['imglink']} alt="flag" className="w-full h-full object-cover" />
                                         </div>
                                         <h4 className="text-center">{course['country']} {course['level']}</h4>
                                     </div>
