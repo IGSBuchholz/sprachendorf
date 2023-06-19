@@ -71,30 +71,25 @@ export async function sendLoginMail(email: string, authCode: number){
 
         console.log("emailsrc", src)
 
-        await request
-        .post({
-          headers: {'content-type': 'application/json'},
-          url: smtpurl,
-          body: JSON.stringify(src)
-        })
-        .on('response', function (response: { statusMessage: any; statusCode: number; }) {
-            console.log(response.statusMessage)
-          if (response.statusCode !== 200) {
-            console.log(response.statusCode)
-            console.log(response.statusMessage)
-            return SendMailResult.SENDERROR;
-          }else{
-            return SendMailResult.SUCCESS;
-          }
-        })
-            //@ts-ignore
-        .on('data', function (data) {
-          console.log('decoded chunk: ' + data)
-        })
-            //@ts-ignore
-        .on('error', function (err) {
-          console.log('Email sender', err)
-        })
+        console.log('Email:', email);
+        const response = await fetch(smtpurl, {
+          method: "POST", // *GET, POST, PUT, DELETE, etc.
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(src), // body data type must match "Content-Type" header
+        });
+
+        const resJson = await response.json();
+
+        console.log("ResJSOn", resJson.data.succeeded);
+
+        if(resJson.data.succeeded>0){
+          return SendMailResult.SUCCESS;
+        }else{
+          return SendMailResult.SENDERROR;
+        }
+
 
     }catch(err){
 

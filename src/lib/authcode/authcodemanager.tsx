@@ -39,7 +39,7 @@ import {eq} from "drizzle-orm";
 
       console.log("SENDMAIL", sendEmail)
       if(sendEmail){
-        await sendLoginMail(email, authCode);
+        console.log("EMAIL-RES", await sendLoginMail(email, authCode));
       }else{
         console.log("NOT SENDING EMAIL")
       }
