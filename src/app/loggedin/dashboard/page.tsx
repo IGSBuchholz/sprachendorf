@@ -5,6 +5,14 @@ import {useEffect, useState} from "react";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
 import {UserSession} from "@/lib/usersession";
+import Link from "next/link";
+import {Variants, motion} from "framer-motion";
+
+const variants: Variants = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 },
+};
 
 //@ts-ignore
 function Dashboard({ user }) {
@@ -52,9 +60,9 @@ function Dashboard({ user }) {
 
             {user.isAdmin ?
                 <div className="flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
-                    <div className="max-w-md w-full bg-blue-500 rounded-lg shadow-md overflow-hidden py-6 text-center cursor-pointer hover:scale-110" onClick={() => {router.push('/loggedin/dashboard/scanner')}} >
+                    <Link href={'/loggedin/dashboard/scanner'} className="max-w-md w-full bg-blue-500 rounded-lg shadow-md overflow-hidden py-6 text-center cursor-pointer hover:scale-110">
                         Kurse-Verifizieren
-                    </div>
+                    </Link>
                 </div>: ""}
 
             <div className=" flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
@@ -71,12 +79,21 @@ function Dashboard({ user }) {
                                         return <></>
                                     }
                                 return (
-                                    <div key={index} className="flex flex-col items-center justify-center text-black">
+                                    <motion.div
+                                        variants={variants}
+                                        initial="initial"
+                                        animate="animate"
+                                        exit="exit"
+                                        key={"kdone" + index}
+                                        transition={{ duration: 0.3 + index*0.15 }}
+                                    >
+                                    <div className="flex flex-col items-center justify-center text-black">
                                         <div className="w-24 h-24 rounded-full overflow-hidden inline-block">
                                             <img src={course['imglink'] + ".svg"} alt="flag" className="w-full h-full object-cover" />
                                         </div>
                                         <h4 className="text-center">{course['country']} {course['level']}</h4>
                                     </div>
+                                    </motion.div>
                                 )
                             })}
                         </div>

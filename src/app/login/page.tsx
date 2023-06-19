@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
 import React from 'react';
 import {redirect, useRouter} from "next/navigation";
+import Link from "next/link";
 
 const variants: Variants = {
   initial: { opacity: 0, y: 20 },
@@ -149,7 +150,7 @@ export default function Home() {
                 <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
                   Schritt 2: Gib den Code ein
                 </h2>
-                <h3 className='text-gray-600 text-xs  mb-4'>Wir haben dir einen Code in dein E-Mail Postfach geschickt, gib diesen bitte hier ein.</h3>
+                <h3 className='text-gray-600 text-xs  mb-4'>Wir haben dir einen Code in dein E-Mail Postfach geschickt, gib diesen bitte hier ein. Es kann einen kleinen moment dauern, bis die E-Mail in deinem Postfach auftaucht.</h3>
                 <motion.form
                   onSubmit={handleSubmitCode}
                   className="space-y-6"
@@ -185,13 +186,18 @@ export default function Home() {
                     >
                       Anmelden
                     </button>
+                    {
+                      showCodeInput ?
                     <button
-                      type="button"
-                      onClick={handleGoBack}
-                      className="text-gray-500 hover:text-gray-700 text-sm focus:outline-none"
+                        type="button"
+                        onClick={handleGoBack}
+                        className="text-gray-500 hover:text-gray-700 text-sm focus:outline-none"
                     >
                       Zurück
-                    </button>
+                    </button> : <Link className="text-gray-500 hover:text-gray-700 text-sm focus:outline-none" href={'/'}>Zurück</Link>
+
+                    }
+
                   </div>
                 </motion.form>
               </>

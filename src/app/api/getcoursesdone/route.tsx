@@ -7,6 +7,8 @@ import {verifyToken} from "@/lib/sessionmanager";
 import {courseCompletitions} from "@/lib/coursecompletition";
 import {eq} from "drizzle-orm";
 
+export let courseCache = new Map();
+
 export async function GET(req: NextRequest) {
 
     const cookies = parse(req.cookies.toString() || '')
@@ -16,6 +18,12 @@ export async function GET(req: NextRequest) {
         if (token) {
 
             const verificationResult = await verifyToken(token);
+
+            if(courseCache.has(token)){
+
+                return new NextResponse( JSON.stringify(courseCache.get(verificationResult?.email)), { status: 200 });
+
+            }
 
             console.log("Verify:", verificationResult);
 
@@ -30,7 +38,7 @@ export async function GET(req: NextRequest) {
                     imglink: courses.imglink,
                 }).from(courseCompletitions).where(eq(verificationResult.email, courseCompletitions.email)).leftJoin(courses, eq(courseCompletitions.country, courses.country));
 
-                console.log(res)
+                courseCache.set(verificationResult.email, res);
 
                 return new NextResponse( JSON.stringify(res), { status: 200 });
             }

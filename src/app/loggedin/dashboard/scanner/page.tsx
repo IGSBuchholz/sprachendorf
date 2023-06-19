@@ -5,24 +5,22 @@ import Image from "next/image";
 import { Course } from "@/lib/conutries";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import dynamic from "next/dynamic";
+import { motion, Variants } from 'framer-motion';
+
+const variants: Variants = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 },
+};
+
+
 //@ts-ignore
 function Scanner({ user }) {
-
-
-
-    if(!user){
-        return <></>;
-    }else{
-        if(!user.isAdmin){
-            return <></>;
-        }
-    }
-
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [email, setEmail] = useState("Not found");
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(0);
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [countries, setCountries] = useState([]);
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -39,6 +37,8 @@ function Scanner({ user }) {
         },
         {ssr: false}
     )
+
+
 
     async function submitCourse(){
 
@@ -68,6 +68,8 @@ function Scanner({ user }) {
 
             setCountries(res.countries)
 
+            setStep(1)
+
         }
 
         getCountries();
@@ -80,65 +82,117 @@ function Scanner({ user }) {
     }
 
     return <>
-        {step==1 ? <>
-            <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-md w-full bg-white rounded-lg shadow-md overflow-hidden">
-                    <div className="p-6">
-                        <h2 className="text-3xl font-extrabold text-black mb-8">
-                            Kurs wählen
-                        </h2>
+        {step==1 && countries ? <>
+            <motion.div
+                variants={variants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={{ duration: 0.3 }}
+            >
+                <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
+                    <div className="max-w-md w-full bg-white rounded-lg shadow-md overflow-hidden">
+                        <div className="p-6">
+                            <h2 className="text-3xl font-extrabold text-black mb-8">
+                                Kurs wählen
+                            </h2>
 
-                        {countries.map((course) => {
-                            function selectCourse(course: Course) {
-                                console.log("Course Set", course)
-                                //@ts-ignore
-                                setSelectedCourse(course)
-                                setStep(2);
-                            }
+                            {countries.map((course, ind) => {
+                                function selectCourse(course: Course) {
+                                    console.log("Course Set", course)
+                                    //@ts-ignore
+                                    setSelectedCourse(course)
+                                    setStep(2);
+                                }
 
-                            // eslint-disable-next-line react/jsx-key
-                            return <div className="drop-shadow-xl bg-white mt-6 rounded-xl hover:scale-105 cursor-pointer" onClick={() => {selectCourse(course)}}>
-                                <div className="text-black py-6 px-4">
-                                    <Image className="inline" alt={course['country']+"-Flagge"} src={course['imglink'] + ".svg"} width={40} height={40}></Image>
-                                    <h3 className="inline ml-4">{course['country']}</h3>
-                                </div>
+                                // eslint-disable-next-line react/jsx-key
+                                return <motion.div
+                                    variants={variants}
+                                    initial="initial"
+                                    animate="animate"
+                                    exit="exit"
+                                    key={ind + "sadasdasdsad"}
+                                    transition={{ duration: 0.3 + ind*0.2 }}
+                                >
+                                    <div className="drop-shadow-xl bg-white mt-6 rounded-xl hover:scale-105 cursor-pointer" onClick={() => {selectCourse(course)}}>
+                                        <div className="text-black py-6 px-4">
+                                            <Image className="inline" alt={course['country']+"-Flagge"} src={course['imglink'] + ".svg"} width={40} height={40}></Image>
+                                            <h3 className="inline ml-4">{course['country']}</h3>
+                                        </div>
 
-                            </div>
-                        })}
+                                    </div>
+                                </motion.div>
 
+
+                            })}
+
+                        </div>
                     </div>
                 </div>
-          </div>
-
-
+            </motion.div>
 
         
-        </> : (step==2 ? <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
+        </> : (step==2 ? <motion.div
+            variants={variants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: 0.3 }}
+        ><div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-md w-full bg-white rounded-lg shadow-md overflow-hidden">
                     <div className="p-6">
                         <h2 className="text-3xl font-extrabold text-black mb-8">
                             Unterkurs wählen
                         </h2>
                         <div className="mx-auto flex justify-center mt-6 py-4">
-                                    {//@ts-ignore
-                                        [...Array(selectedCourse.levels)].map((elementInArray, index) => (
-                                    <div className="text-black rounded-full px-7 py-6 inline shadow-md bg-white mr-6 hover:bg-sky-100 cursor-pointer" onClick={() => {setLevel(index+1)}} key={index}>{index+1}</div> 
-                                )  
+
+                            {//@ts-ignore
+                                        [...Array(selectedCourse.levels)].map((elementInArray, index) => {
+                                    return <motion.div
+                                        key={index + "asdasdiadioaoijdsa"}
+                                        variants={variants}
+                                        initial="initial"
+                                        animate="animate"
+                                        exit="exit"
+                                        transition={{ duration: 0.3 + index*0.2 }}
+                                    ><div className="text-black rounded-full px-7 py-6 inline shadow-md bg-white mr-6 hover:bg-sky-100 cursor-pointer" onClick={() => {setLevel(index+1)}} key={index}>{index+1}</div></motion.div>
+                            }
                             )}
                         </div>
-                        
+
                     </div>
                 </div>
-          </div> : (step==3 ? <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
+        </div> </motion.div> : (step==3 ? <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-md w-full bg-white rounded-lg shadow-md overflow-hidden">
                     <div className="p-6">
                         <h2 className="text-3xl font-extrabold text-black mb-8">
                             Auf welchem Niveau wurde das gemacht?
                         </h2>
                         <div className="mx-auto flex justify-center mt-6 py-4">
-                            <div className="text-black rounded-full px-3 py-4 inline shadow-md bg-white mr-6 hover:bg-sky-100 cursor-pointer text-3xl scale-80" onClick={() => {setStep(4); setCourseNiveau(3)}} key={"great"}>😁</div> 
-                            <div className="text-black rounded-full px-3 py-4 inline shadow-md bg-white mr-6 hover:bg-sky-100 cursor-pointer text-3xl scale-80" onClick={() => {setStep(4); setCourseNiveau(2)}} key={"good"}>🙂</div> 
-                            <div className="text-black rounded-full px-3 py-4 inline shadow-md bg-white mr-6 hover:bg-sky-100 cursor-pointer text-3xl scale-80" onClick={() => {setStep(4); setCourseNiveau(1)}} key={"mid"}>😐</div> 
+                            <motion.div
+                                variants={variants}
+                                initial="initial"
+                                animate="animate"
+                                exit="exit"
+                                transition={{ duration: 0.3 }}
+                            >                            <div className="text-black rounded-full px-3 py-4 inline shadow-md bg-white mr-6 hover:bg-sky-100 cursor-pointer text-3xl scale-80" onClick={() => {setStep(4); setCourseNiveau(3)}} key={"great"}>😁</div>
+                            </motion.div>
+                            <motion.div
+                                variants={variants}
+                                initial="initial"
+                                animate="animate"
+                                exit="exit"
+                                transition={{ duration: 0.5 }}
+                            >                            <div className="text-black rounded-full px-3 py-4 inline shadow-md bg-white mr-6 hover:bg-sky-100 cursor-pointer text-3xl scale-80" onClick={() => {setStep(4); setCourseNiveau(2)}} key={"good"}>🙂</div>
+                            </motion.div>
+                            <motion.div
+                                variants={variants}
+                                initial="initial"
+                                animate="animate"
+                                exit="exit"
+                                transition={{ duration: 0.7 }}
+                            >                            <div className="text-black rounded-full px-3 py-4 inline shadow-md bg-white mr-6 hover:bg-sky-100 cursor-pointer text-3xl scale-80" onClick={() => {setStep(4); setCourseNiveau(1)}} key={"mid"}>😐</div>
+                            </motion.div>
 
                         </div>
                         
@@ -147,10 +201,18 @@ function Scanner({ user }) {
           </div> : (step==4 ? <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full bg-white rounded-lg shadow-md overflow-hidden">
                     <div className="p-6">
-                        <h2 className="text-3xl font-extrabold text-black mb-8">
-                            QR-Code scannen
-                        </h2>
 
+                        <motion.div
+                            variants={variants}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            transition={{ duration: 0.7 }}
+                        >
+                            <h2 className="text-3xl font-extrabold text-black mb-8">
+                                QR-Code scannen
+                            </h2>
+                        </motion.div>
                         <BScanner
                             width={500}
                             height={500}
@@ -182,12 +244,35 @@ function Scanner({ user }) {
                             <h2 className="text-3xl font-extrabold text-black mb-8">
                                 Daten bestätigen
                             </h2>
+                            <motion.div
+                                variants={variants}
+                                initial="initial"
+                                animate="animate"
+                                exit="exit"
+                                transition={{ duration: 0.3 }}
+                            >
+                                <h3 className="text-black"><b>{selectedCourse['country']}</b> ({courseNiveau})</h3>
+                            </motion.div>
 
-                            <h3 className="text-black"><b>{selectedCourse['country']}</b> ({courseNiveau})</h3>
-
+                            <motion.div
+                                variants={variants}
+                                initial="initial"
+                                animate="animate"
+                                exit="exit"
+                                transition={{ duration: 0.5 }}
+                            >
                             <h3 className="text-black"><b>E-Mail: </b>{email}</h3>
+                            </motion.div>
 
+                            <motion.div
+                                variants={variants}
+                                initial="initial"
+                                animate="animate"
+                                exit="exit"
+                                transition={{ duration: 0.7 }}
+                            >
                             <h3 className="text-black"><b>Niveau:</b> {courseNiveau}/3</h3>
+                            </motion.div>
 
                             <button onClick={submitCourse} className="rounded-xl bg-blue-500 px-6 py-2 mx-auto flex justify-center">Bestätigen</button>
 
@@ -196,11 +281,13 @@ function Scanner({ user }) {
                 </div>        
 
             
-            </> : "How did you get here?🤓🤓"))))}
+            </> : <div className="flex justify-center items-center h-screen bg-white">
+            <div className="inline-flex animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-gray-900"></div>
+        </div>))))}
     
     </>
 
 }
 
 
-export default withAuth(Scanner)
+export default withAuth(Scanner, true)

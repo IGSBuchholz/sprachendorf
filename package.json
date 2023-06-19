@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@nextui-org/react": "^1.0.0-beta.13",
+    "@react-pdf/renderer": "^3.1.12",
     "@sendgrid/mail": "^7.7.0",
     "@types/node": "20.2.1",
     "@types/react": "18.2.6",
@@ -36,6 +37,7 @@
     "pg": "^8.10.0",
     "postcss": "8.4.23",
     "postgres": "^3.3.5",
+    "puppeteer": "^20.7.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-intersection-observer": "^9.4.3",
