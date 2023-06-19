@@ -68,6 +68,8 @@ export async function POST(req: Request) {
 
             }else{
 
+
+
                 const token = await createToken(
                     {
                         id: userData.email,
@@ -92,8 +94,13 @@ export async function POST(req: Request) {
 
         return new NextResponse(loginStatus)
     }else{
+        let sendEmail = true;
+        if(body.sendEmail != null){
+            console.log("BODY SENDEMAIL")
+            sendEmail = body.sendEmail;
+        }
         console.log("fuck")
-        console.log(await issueAuthCode(mail))
+        console.log(await issueAuthCode(mail, sendEmail))
         console.log("fucked");
         return new NextResponse("CODE SENT", { status: 201 })
     }

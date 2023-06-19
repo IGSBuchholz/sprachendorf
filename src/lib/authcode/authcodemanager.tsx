@@ -10,7 +10,7 @@ import {eq} from "drizzle-orm";
     EMAIL_ERROR = 'EMAIL_ERROR'
   }
 
-  export async function issueAuthCode(email: string): Promise<AuthCodeIssueingResult> {
+  export async function issueAuthCode(email: string, sendEmail = true): Promise<AuthCodeIssueingResult> {
 
     const authCode = Math.floor(100000 + Math.random() * 900000); // Generate a random number
 
@@ -37,8 +37,12 @@ import {eq} from "drizzle-orm";
 
     try{
 
-      await sendLoginMail(email, authCode);
-
+      console.log("SENDMAIL", sendEmail)
+      if(sendEmail){
+        await sendLoginMail(email, authCode);
+      }else{
+        console.log("NOT SENDING EMAIL")
+      }
     }catch(err){
 
       return AuthCodeIssueingResult.EMAIL_ERROR;
