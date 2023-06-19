@@ -251,7 +251,7 @@ function Scanner({ user }) {
                                 exit="exit"
                                 transition={{ duration: 0.3 }}
                             >
-                                <h3 className="text-black"><b>{selectedCourse['country']}</b> ({courseNiveau})</h3>
+                                <h3 className="text-black"><b>{selectedCourse['country']}</b> ({courseLevel})</h3>
                             </motion.div>
 
                             <motion.div
