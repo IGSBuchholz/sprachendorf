@@ -55,7 +55,6 @@ enum SendMailResult{
 
 export async function sendLoginMail(email: string, authCode: number){
 
-
     const fromMail = await getConfiguration("sg_Sender")
     if(fromMail == undefined){
         return SendMailResult.FROMMAIL_UNKNOWN;
