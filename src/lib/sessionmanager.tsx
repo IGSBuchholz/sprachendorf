@@ -41,7 +41,7 @@ export async function getSessionKey(forceReload = false): Promise<string>{
 export async function createToken(payload: any): Promise<string> {
     const secret = await getSessionKey();
     console.log("Secret key creating a token:", secret)
-    const signed = jwt.sign(payload, secret, {expiresIn: '7d'})
+    const signed = jwt.sign(payload, secret)
     console.log("FING TOKEN ", signed)
     return signed;
 }

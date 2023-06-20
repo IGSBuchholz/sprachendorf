@@ -82,7 +82,7 @@ import {eq} from "drizzle-orm";
         let nowDate = new Date(Date.now());
 
         if(expiryDate.getMilliseconds() > nowDate.getMilliseconds() || true){
-          await connection.delete(authCodes).where(eq(authCodes.email, email));
+          await connection.delete(authCodes).where(eq(authCodes.authCode, authCode));
           return AuthCodeEvaluationResult.SUCCESS;
         }
         return AuthCodeEvaluationResult.CODE_EXPIRED;
