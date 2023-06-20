@@ -7,6 +7,7 @@ import {useRouter} from "next/navigation";
 import {UserSession} from "@/lib/usersession";
 import Link from "next/link";
 import {Variants, motion} from "framer-motion";
+import { ExportButton } from "@/lib/exportpdf";
 
 const variants: Variants = {
     initial: { opacity: 0, y: 20 },
@@ -71,6 +72,7 @@ function Dashboard({ user }) {
                         <h2 className="text-3xl font-extrabold text-black mb-8 text-center">
                             Abgeschlossene Stationen
                         </h2>
+                        { coursesDone.length > 0 ? <ExportButton coursesDone={coursesDone} usersname={user.name} /> : ""}
                         <div className="grid grid-cols-3 gap-4">
                             {//ts-ignore
                                 coursesDone.map((course, index) => {
