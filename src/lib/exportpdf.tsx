@@ -1,4 +1,5 @@
 //@ts-ignore
+//@ts-nocheck
 import { Document, Page, View, Image, Text, StyleSheet, PDFDownloadLink, Canvas } from '@react-pdf/renderer';
 
 export const ExportButton = ({coursesDone, usersname}) => (
