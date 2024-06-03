@@ -5,7 +5,8 @@ export const courses = pgTable('courses', {
   id: serial('id').primaryKey(),
   country: text('language').notNull(),
   levels: integer('levels'),
-  imglink: text('imglink')
+  imglink: text('imglink'),
+  maxusers: integer('maxusers')
 });
 
 

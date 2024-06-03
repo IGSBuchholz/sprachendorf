@@ -1,8 +1,12 @@
+import {range} from "@nextui-org/react/types/utils/numbers";
+
 const sgMail = require('@sendgrid/mail');
 import { sendLoginMail } from "../mailhandler";
 import {authCode, authCodes, NewAuthCode} from "./authcode";
 import { getDatabaseConnection } from "../databsemanager";
 import {eq} from "drizzle-orm";
+import {integer} from "drizzle-orm/pg-core";
+import Integer from "@zxing/library/esm5/core/util/Integer";
 
   export enum AuthCodeIssueingResult {
     SUCCESS = 'SUCCESS',
@@ -23,7 +27,7 @@ import {eq} from "drizzle-orm";
     try{
       const connection = await getDatabaseConnection();
 
-      const newAuthCode: NewAuthCode = {email: email.toLocaleLowerCase(), authCode: authCode}
+      const newAuthCode: NewAuthCode = {id: authCode, email: email.toLocaleLowerCase(), authCode: authCode}
 
       await connection.insert(authCodes).values(newAuthCode);
 

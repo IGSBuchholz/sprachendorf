@@ -8,6 +8,7 @@ import {UserSession} from "@/lib/usersession";
 import Link from "next/link";
 import {Variants, motion} from "framer-motion";
 import { ExportButton } from "@/lib/exportpdf";
+import {boolean} from "drizzle-orm/pg-core";
 
 const variants: Variants = {
     initial: { opacity: 0, y: 20 },
@@ -22,6 +23,11 @@ function Dashboard({ user }) {
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [coursesDone, setCoursesDone] = useState([]);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [events, setEvents] = useState({
+        showPDF: false,
+        cleanUp: false
+    });
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
 
@@ -39,6 +45,21 @@ function Dashboard({ user }) {
 
         }
 
+        const getEvents = async () => {
+            const response = await fetch("/api/currentevent", {
+                method: "GET", // *GET, POST, PUT, DELETE, etc.
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const res = await response.json();
+            console.log(res.showPDF)
+            setEvents(res)
+
+        }
+
+        getEvents()
         fetchCoursesDone()
 
     }, [])
@@ -48,6 +69,22 @@ function Dashboard({ user }) {
 
     return <>
         <div className={"min-h-screen bg-white"}>
+
+            {events.cleanUp ? <div className="flex items-center justify-center bg-white pt-6 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-md w-full bg-red-500 rounded-lg shadow-md overflow-hidden">
+                    <div className="p-6 text-center">
+                        <h3>Bitte begib dich zur Station <b>{user.startCountry}</b> um bei den Aufräumarbeiten zu helfen!</h3>
+                    </div>
+                </div>
+            </div> : coursesDone.length == 0 ? <div className="flex items-center justify-center bg-white pt-6 px-4 sm:px-6 lg:px-8">
+                    <div className="max-w-md w-full bg-green-500 rounded-lg shadow-md overflow-hidden">
+                        <div className="p-6 text-center">
+                            <h3>Deine erste Station ist <b>{user.startCountry}</b>, begib dich zu dieser!</h3>
+                        </div>
+                    </div>
+                </div>
+            : ""}
+
             <div className="flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-md w-full bg-white rounded-lg shadow-md overflow-hidden">
                     <div className="p-6 mb-6">
@@ -72,8 +109,8 @@ function Dashboard({ user }) {
                         <h2 className="text-3xl font-extrabold text-black mb-8 text-center">
                             Abgeschlossene Stationen
                         </h2>
-                        { coursesDone.length > 0 ? <ExportButton coursesDone={coursesDone} usersname={user.name} /> : ""}
-                        <div className="grid grid-cols-3 gap-4">
+                        { events.showPDF ? <ExportButton coursesDone={coursesDone} usersname={user.name} /> : ""}
+                        { coursesDone.length > 0 ? <div className="grid grid-cols-3 gap-4">
                             {//ts-ignore
                                 coursesDone.map((course, index) => {
                                     if(!course) return <></>
@@ -98,7 +135,11 @@ function Dashboard({ user }) {
                                     </motion.div>
                                 )
                             })}
-                        </div>
+                        </div> :
+
+                            <h3 className={"text-gray-400 text-center"}>Du hast noch keine Station abgeschlossen!</h3>
+
+                        }
                     </div>
                 </div>
             </div>

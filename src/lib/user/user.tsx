@@ -6,6 +6,7 @@ export const users = pgTable('users', {
   email: text('email').notNull(),
   lastRequest: text('lastRequest'),
   isAdmin: boolean('isAdmin'),
+  startcountry: text('startcountry')
 });
 
 

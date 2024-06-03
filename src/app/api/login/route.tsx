@@ -4,7 +4,7 @@ import {createToken} from "../../../lib/sessionmanager";
 import { evaluateAuthCode, AuthCodeEvaluationResult } from "../../../lib/authcode/authcodemanager";
 import { issueAuthCode, AuthCodeIssueingResult } from '../../../lib/authcode/authcodemanager';
 import {getConfiguration} from "../../../lib/config/configmanager";
-import {getUser} from "../../../lib/user/usermanager";
+import {getUser, insertUser} from "../../../lib/user/usermanager";
 import {User} from "../../../lib/user/user";
 import {getNameFromEmail} from "../../../lib/mailhandler";
 
@@ -44,18 +44,23 @@ export async function POST(req: Request) {
 
             const userData: User | undefined = await getUser(mail.toLocaleLowerCase());
 
-            
+            console.log("UD:" + userData)
 
             if(!userData){
+                console.log("WOM")
+
+                const usr = await insertUser(mail, false);
+
 
                 const token = await createToken(
                     {
                         id: 999,
                         email: mail,
                         isAdmin: false,
+                        startCountry: usr.startcountry,
                         name: await getNameFromEmail(mail as string)
                     });
-    
+
                 console.log("Mfing token from someone who has no user account", token)
     
                 // Set the token as a cookie
@@ -75,6 +80,7 @@ export async function POST(req: Request) {
                         id: userData.email,
                         email: userData.email,
                         isAdmin: userData.isAdmin,
+                        startCountry: (userData.startcountry ? userData.startcountry : ""),
                         name: await getNameFromEmail(userData.email as string)
                     });
     

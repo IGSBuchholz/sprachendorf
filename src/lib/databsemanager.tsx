@@ -1,16 +1,9 @@
-import fs from 'fs';
-import path from 'path';
 import { PostgresJsDatabase, drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 
-const configFilePath = path.resolve(__dirname, 'dbConfig.json');
 
 export let dbCon: PostgresJsDatabase;
 
-export async function saveDatabaseConfiguration(connectionOptions: any): Promise<void> {
-    console.warn("WRITING DATABASE CONFIGURATION FOR SOME REASON")
-    fs.writeFileSync(configFilePath, connectionOptions);
-}
 
 export async function getDatabaseConfiguration(): Promise<string> {
     //const configFileContent = fs.readFileSync(configFilePath, 'utf8');
@@ -27,11 +20,11 @@ export async function getDatabaseConnection(connectionString?: any): Promise<Pos
     console.log("test debug message:", connectionStringInitially)
 
     if(!connectionStringInitially){
-    // Try to get the existing connection
-    if(dbCon != null){
-        console.log("Not Null")
-        return dbCon;
-    }
+        // Try to get the existing connection
+        if(dbCon != null){
+            console.log("Not Null")
+            return dbCon;
+        }
         try{
             connectionString = await getDatabaseConfiguration();
         }catch(ex){

@@ -3,11 +3,10 @@ import { courses, Course } from "@/lib/conutries";
 import { getDatabaseConnection } from "@/lib/databsemanager";
 import { NextResponse } from "next/server";
 
-let countrieCache = [];
+let countrieCache: Course[] = [];
 let lastFetch: number;
 
-export async function GET(req: Request){
-
+export async function getCountries(){
     if(!lastFetch){
         console.log("refedinedas")
         lastFetch = Date.now();
@@ -25,7 +24,16 @@ export async function GET(req: Request){
         countrieCache = res;
     }
 
-    return new NextResponse(JSON.stringify({"countries": countrieCache}))
+    console.log("CC" + countrieCache)
+
+    return countrieCache
+}
+
+export async function GET(req: Request){
+
+
+
+    return new NextResponse(JSON.stringify({"countries": await getCountries()}))
 
 }
 
