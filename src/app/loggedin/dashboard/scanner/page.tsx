@@ -3,9 +3,11 @@ import withAuth from "@/lib/authHOC"
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Course } from "@/lib/conutries";
-import BarcodeScannerComponent from "react-qr-barcode-scanner";
+// @ts-ignore
+import { Scanner } from '@yudiel/react-qr-scanner';
 import dynamic from "next/dynamic";
 import { motion, Variants } from 'framer-motion';
+
 
 const variants: Variants = {
     initial: { opacity: 0, y: 20 },
@@ -15,7 +17,7 @@ const variants: Variants = {
 
 
 //@ts-ignore
-function Scanner({ user }) {
+function ScannerComp({ user }) {
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [email, setEmail] = useState("Not found");
@@ -30,13 +32,6 @@ function Scanner({ user }) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [courseNiveau, setCourseNiveau] = useState(1);
 
-
-    const BScanner = dynamic(
-        () => {
-            return import('react-qr-barcode-scanner')
-        },
-        {ssr: false}
-    )
 
 
 
@@ -81,6 +76,8 @@ function Scanner({ user }) {
         setStep(3);
     }
 
+    // @ts-ignore
+    // @ts-ignore
     return <>
         {step==1 && countries ? <>
             <motion.div
@@ -213,10 +210,10 @@ function Scanner({ user }) {
                                 QR-Code scannen
                             </h2>
                         </motion.div>
-                        <BScanner
-                            width={500}
-                            height={500}
-                            onUpdate={(err, result) => {
+                        <Scanner
+
+                            //@ts-ignore
+                            onScan={(result) => {
                                 if (result){
                                     const emailRegex = new RegExp('^[a-zA-Z0-9._%+-]+@igs-buchholz\.de$')
                                     //@ts-ignore
@@ -290,4 +287,4 @@ function Scanner({ user }) {
 }
 
 
-export default withAuth(Scanner, true)
+export default withAuth(ScannerComp, true)
