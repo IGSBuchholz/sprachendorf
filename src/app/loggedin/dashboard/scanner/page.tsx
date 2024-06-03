@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Course } from "@/lib/conutries";
 // @ts-ignore
-import { Scanner } from '@yudiel/react-qr-scanner';
+import { QrScanner } from "@yudiel/react-qr-scanner";
 import dynamic from "next/dynamic";
 import { motion, Variants } from 'framer-motion';
 
@@ -210,16 +210,14 @@ function ScannerComp({ user }) {
                                 QR-Code scannen
                             </h2>
                         </motion.div>
-                        <Scanner
+                        <QrScanner
 
                             //@ts-ignore
                             onScan={(result) => {
                                 if (result){
                                     const emailRegex = new RegExp('^[a-zA-Z0-9._%+-]+@igs-buchholz\.de$')
                                     //@ts-ignore
-                                    console.log("E-Mail:", result.text)
-                                    //@ts-ignore
-                                    setEmail(result.text.toString());
+                                    setEmail(result);
                                     //@ts-ignore
                                     if(result.text.endsWith("@igs-buchholz.de")){
                                         console.log("E-Mail passed:", email)

@@ -6,7 +6,6 @@ import {authCode, authCodes, NewAuthCode} from "./authcode";
 import { getDatabaseConnection } from "../databsemanager";
 import {eq} from "drizzle-orm";
 import {integer} from "drizzle-orm/pg-core";
-import Integer from "@zxing/library/esm5/core/util/Integer";
 
   export enum AuthCodeIssueingResult {
     SUCCESS = 'SUCCESS',
