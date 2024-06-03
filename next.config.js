@@ -4,6 +4,7 @@ const nextConfig = {
         serverActions: true,
         serverComponentsExternalPackages: ['pg', 'typeorm']
     },
+    output: "standalone",
 }
 
 module.exports = nextConfig
