@@ -3,7 +3,7 @@ import { getDatabaseConnection } from '../databsemanager'; // Assuming this is t
 import { User, users, NewUser } from './user';
 import {PostgresJsDatabase} from "drizzle-orm/postgres-js";
 import {Course, courses} from "@/lib/conutries";
-import {getCountries} from "@/app/api/getcountries/route"; // The User entity defined above.
+import {getCountries} from "@/lib/countriesmanager";
 
     export async function getUser(emailAdress: string): Promise<User | undefined> {
         const db = await getDatabaseConnection();
