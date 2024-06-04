@@ -219,11 +219,11 @@ function ScannerComp({ user }) {
                                 if (result){
                                     const emailRegex = new RegExp('^[a-zA-Z0-9._%+-]+@igs-buchholz\.de$')
                                     //@ts-ignore
-                                    setEmail(result.rawValue);
-                                    console.log("Res:", result);
+                                    setEmail(result[0].rawValue);
+                                    console.log("Res:", result[0].rawValue);
                                     alert(result.toString());
                                     //@ts-ignore
-                                    if(result.rawValue.endsWith("@igs-buchholz.de")){
+                                    if(result[0].rawValue.endsWith("@igs-buchholz.de")){
                                         console.log("E-Mail passed:", email)
                                         setStep(5);
                                     }
