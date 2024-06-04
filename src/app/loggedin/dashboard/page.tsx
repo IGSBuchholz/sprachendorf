@@ -70,13 +70,14 @@ function Dashboard({ user }) {
     return <>
         <div className={"min-h-screen bg-white"}>
 
-            {events.cleanUp ? <div className="flex items-center justify-center bg-white pt-6 px-4 sm:px-6 lg:px-8">
+
+            {events.cleanUp && !user.isAdmin ? <div className="flex items-center justify-center bg-white pt-6 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-md w-full bg-red-500 rounded-lg shadow-md overflow-hidden">
                     <div className="p-6 text-center">
                         <h3>Bitte begib dich zur Station <b>{user.startCountry}</b> um bei den Aufräumarbeiten zu helfen!</h3>
                     </div>
                 </div>
-            </div> : coursesDone.length == 0 ? <div className="flex items-center justify-center bg-white pt-6 px-4 sm:px-6 lg:px-8">
+            </div> : coursesDone.length == 0 && !user.isAdmin? <div className="flex items-center justify-center bg-white pt-6 px-4 sm:px-6 lg:px-8">
                     <div className="max-w-md w-full bg-green-500 rounded-lg shadow-md overflow-hidden">
                         <div className="p-6 text-center">
                             <h3>Deine erste Station ist <b>{user.startCountry}</b>, begib dich zu dieser!</h3>

@@ -221,7 +221,6 @@ function ScannerComp({ user }) {
                                     //@ts-ignore
                                     setEmail(result[0].rawValue);
                                     console.log("Res:", result[0].rawValue);
-                                    alert(result.toString());
                                     //@ts-ignore
                                     if(result[0].rawValue.endsWith("@igs-buchholz.de")){
                                         console.log("E-Mail passed:", email)

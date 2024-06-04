@@ -46,7 +46,6 @@ export default function Home() {
 
   const handleCodeChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    
     if (value.length <= 1) {
       const newCode = [...code];
       newCode[index] = value;
@@ -63,6 +62,9 @@ export default function Home() {
   const handleSubmitEmail = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log('Email:', email);
+    if(!email.endsWith("@igs-buchholz.de")){
+
+    }
     const bodyContent = JSON.stringify({email: email})
     setShowCodeInput(true);
     const response = await fetch("/api/login", {
@@ -101,9 +103,11 @@ export default function Home() {
     }
   };
 
-  return (
+  return <>
+
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md overflow-hidden">
+
         <div className="p-6">
           <motion.div
             variants={variants}
@@ -163,7 +167,7 @@ export default function Home() {
                   <div className="flex justify-center">
                     {code.map((digit, index) => (
                         // eslint-disable-next-line react/jsx-key
-                      <div className='ml-4'>
+                      <div className='ml-2'>
                         <input
                       key={index}
                       ref={codeInputRefs[index]}
@@ -173,7 +177,7 @@ export default function Home() {
                       maxLength={1}
                       value={digit}
                       onChange={(event) => handleCodeChange(index, event)}
-                      className="w-12 h-12 text-center text-gray-900 text-2xl border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-12 h-14 text-center text-gray-900 text-2xl border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                       />
                       </div>
                       
@@ -206,5 +210,5 @@ export default function Home() {
         </div>
       </div>
     </div>
-  );
+  </>;
 }
