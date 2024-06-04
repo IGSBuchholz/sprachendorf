@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
                 const body = await req.json();
                 console.log("Reqbody", body)
 
-                const newCC: NewCourseCompletition = {email: body.email.toLocaleLowerCase(), country: body.course.country, level: body.level, niveau: body.courseNiveau}
+                const newCC: NewCourseCompletition = {id: Math.floor(Math.random()*1000000), email: body.email.toLocaleLowerCase(), country: body.course.country, level: body.level, niveau: body.courseNiveau}
 
                 await conn.insert(courseCompletitions).values(newCC)
 
