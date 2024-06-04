@@ -47,6 +47,7 @@ function ScannerComp({ user }) {
           },
           body: bodyContent, // body data type must match "Content-Type" header
         });
+        console.log(response.status);
         setStep(2);
     }
 
