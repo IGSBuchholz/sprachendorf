@@ -4,7 +4,7 @@ import {createToken} from "../../../lib/sessionmanager";
 import { evaluateAuthCode, AuthCodeEvaluationResult } from "../../../lib/authcode/authcodemanager";
 import { issueAuthCode, AuthCodeIssueingResult } from '../../../lib/authcode/authcodemanager';
 import {getConfiguration} from "../../../lib/config/configmanager";
-import {getUser, insertUser} from "../../../lib/user/usermanager";
+import {checkCountry, getUser, insertUser} from "../../../lib/user/usermanager";
 import {User} from "../../../lib/user/user";
 import {getNameFromEmail} from "../../../lib/mailhandler";
 
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
 
         if (loginStatus == AuthCodeEvaluationResult.SUCCESS) {
 
-            const userData: User | undefined = await getUser(mail.toLocaleLowerCase());
+            let userData: User | undefined = await getUser(mail.toLocaleLowerCase());
 
             console.log("UD:" + userData)
 
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
 
             }else{
 
-
+                userData = await checkCountry(userData);
 
                 const token = await createToken(
                     {

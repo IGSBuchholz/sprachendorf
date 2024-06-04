@@ -4,6 +4,8 @@ import { User, users, NewUser } from './user';
 import {PostgresJsDatabase} from "drizzle-orm/postgres-js";
 import {Course, courses} from "@/lib/conutries";
 import {getCountries} from "@/lib/countriesmanager";
+import {Simulate} from "react-dom/test-utils";
+import select = Simulate.select;
 
     export async function getUser(emailAdress: string): Promise<User | undefined> {
         const db = await getDatabaseConnection();
@@ -31,11 +33,23 @@ import {getCountries} from "@/lib/countriesmanager";
 
         const countryChosen = await chooseCountry(connection)
         console.log("WTF ist das ")
-        const newUser: NewUser = {id: Math.floor(Math.random()*9999999), email: email, isAdmin: isAdmin, lastRequest: lastRequestDate.toString(), startcountry: countryChosen.country}
+        const newUser: NewUser = {id: Math.floor(Math.random()*9999999), email: email.toLowerCase(), isAdmin: isAdmin, lastRequest: lastRequestDate.toString(), startcountry: countryChosen.country}
 
         console.log(newUser)
         await connection.insert(users).values(newUser);
         return newUser;
+    }
+
+    export async function checkCountry(user: User): Promise<User>{
+        const connection = await getDatabaseConnection();
+
+        if(user.startcountry == "Polen"){
+            const chosenCountry = await chooseCountry(connection);
+            await connection.update(users).set({startcountry: chosenCountry.country}).where(eq(users.email, user.email.toLowerCase()))
+            user.startcountry = chosenCountry.country
+        }
+
+        return user;
     }
 
     export async function chooseCountry(connection: PostgresJsDatabase) : Promise<Course>{
