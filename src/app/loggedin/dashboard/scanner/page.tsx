@@ -2,7 +2,7 @@
 import withAuth from "@/lib/authHOC"
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Course } from "@/lib/conutries";
+import {Course, Role} from "@prisma/client";
 // @ts-ignore
 import { Scanner } from "@yudiel/react-qr-scanner";
 import dynamic from "next/dynamic";
@@ -218,11 +218,18 @@ function ScannerComp({ user }) {
                             onScan={(result) => {
                                 if (result){
                                     const emailRegex = new RegExp('^[a-zA-Z0-9._%+-]+@igs-buchholz\.de$')
+                                    let rawValue = result[0].rawValue;
+                                    let rawValueSplit = result[0].rawValue.split("....");
+                                    console.log(rawValueSplit);
+                                    if((rawValueSplit.length != 2)){
+                                        return;
+                                    }
+                                    let email = rawValueSplit[1].replace("%40", "@")
                                     //@ts-ignore
-                                    setEmail(result[0].rawValue);
-                                    console.log("Res:", result[0].rawValue);
+                                    setEmail(email);
+                                    console.log("Res:", rawValueSplit[1]);
                                     //@ts-ignore
-                                    if(result[0].rawValue.endsWith("@igs-buchholz.de")){
+                                    if(email.endsWith("@igs-buchholz.de") ){
                                         console.log("E-Mail passed:", email)
                                         setStep(5);
                                     }
@@ -288,4 +295,4 @@ function ScannerComp({ user }) {
 }
 
 
-export default withAuth(ScannerComp, true)
+export default withAuth(ScannerComp, Role.HELPER)

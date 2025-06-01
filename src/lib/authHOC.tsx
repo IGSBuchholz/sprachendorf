@@ -2,8 +2,13 @@
 'use client';
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { Role } from '@prisma/client'
+import {roleIsGreaterOrEqual} from "@/lib/user/usermanager";
+
+
+
 //@ts-ignore
-const withAuth = (WrappedComponent, needAdmin = false) => {
+const withAuth = (WrappedComponent, neededRole: Role = 'USER') => {
     //@ts-ignore
     // eslint-disable-next-line react/display-name
   return (props) => {
@@ -22,10 +27,8 @@ const withAuth = (WrappedComponent, needAdmin = false) => {
                 console.log(data.user);
                 setUser(data.user);
                 setIsVerifying(false);
-                if(needAdmin){
-                    if(!data.user.isAdmin){
-                        router.replace('/loggedin/dashboard')
-                    }
+                if(!roleIsGreaterOrEqual(data.user.role, neededRole)){
+                    router.replace('/loggedin/dashboard')
                 }
             } else {
                 router.replace("/login"); // replace with your login route

@@ -3,7 +3,6 @@ import cryptoRandomString from 'crypto-random-string';
 import fs from 'fs';
 import path from 'path';
 import jwt, { JwtPayload } from 'jsonwebtoken'
-import { User } from '@/lib/user/user';
 import { UserSession } from '@/lib/usersession';
 import { Session } from 'inspector';
 

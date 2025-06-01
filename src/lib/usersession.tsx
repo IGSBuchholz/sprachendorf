@@ -1,9 +1,11 @@
+import type { Role } from '@prisma/client'
+
 export type UserSession = {
     id: number
     email: string
-    isAdmin: boolean,
+    role: Role,
     name: string,
     iat: number,
     exp: number,
 }
-  
+

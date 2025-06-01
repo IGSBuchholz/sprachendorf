@@ -1,114 +1,87 @@
 'use server'
 import { NextRequest, NextResponse } from "next/server";
-import {createToken} from "../../../lib/sessionmanager";
-import { evaluateAuthCode, AuthCodeEvaluationResult } from "../../../lib/authcode/authcodemanager";
-import { issueAuthCode, AuthCodeIssueingResult } from '../../../lib/authcode/authcodemanager';
-import {getConfiguration} from "../../../lib/config/configmanager";
-import {checkCountry, getUser, insertUser} from "../../../lib/user/usermanager";
-import {User} from "../../../lib/user/user";
-import {getNameFromEmail} from "../../../lib/mailhandler";
+import { createToken } from "@/lib/sessionmanager";
+import { evaluateAuthCode, AuthCodeEvaluationResult } from "@/lib/authcode/authcodemanager";
+import { issueAuthCode, AuthCodeIssueingResult } from "@/lib/authcode/authcodemanager";
+import { getConfiguration } from "@/lib/config/configmanager";
+import { checkCountry, getUser, insertUser } from "@/lib/user/usermanager";
+import {Role, User} from "@prisma/client";
+import { getNameFromEmail } from "@/lib/mailhandler";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  console.log("Router reached");
 
-    console.log("Unfortionately it works so far so the problem is somewhere else")
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@igs-buchholz\.de$/;
+  const body = await req.json();
 
-    const emailRegex = new RegExp('^[a-zA-Z0-9._%+-]+@igs-buchholz\.de$')
+  if (!body || !body.email) {
+    console.log("No Email provided");
+    return new NextResponse("No Email Provided", { status: 400 });
+  }
 
-    console.log(emailRegex)
+  const mail: string = body.email;
+  if (!emailRegex.test(mail)) {
+    return new NextResponse("Wrong E-Mail Regex", { status: 400 });
+  }
 
-    const body = await req.json();
+  const code: number | undefined = body.code;
 
-    if(!body || !body.email){
+  if (code != null) {
+    const loginStatus = await evaluateAuthCode(mail.toLowerCase(), code);
+    console.log(`Auth code evaluation result for ${mail}: ${loginStatus}`);
 
-        console.log("Returning Error on Router () because no E-Mail provided")
-        return new NextResponse("No Email Provided", {status: 204});        
-    
+    if (loginStatus === AuthCodeEvaluationResult.SUCCESS) {
+      let userData: User | null = await getUser(mail.toLowerCase());
+      console.log("Fetched user data:", userData);
+
+      if (!userData) {
+        const newUser = await insertUser(mail, Role.USER);
+        const token = await createToken({
+          id: newUser.email,
+          email: newUser.email,
+          role: newUser.role,
+          startCountry: newUser.startcountry || "",
+          name: await getNameFromEmail(newUser.email),
+        });
+
+        return new NextResponse("User Logged In", {
+          status: 200,
+          headers: {
+            'Set-Cookie': `token=${token}; Path=/; HttpOnly; SameSite=Lax`,
+          },
+        });
+      } else {
+        userData = await checkCountry(userData);
+        const token = await createToken({
+          id: userData.email,
+          email: userData.email,
+          role: userData.role,
+          startCountry: userData.startcountry || "",
+          name: await getNameFromEmail(userData.email),
+        });
+
+        return new NextResponse("User Logged In", {
+          status: 200,
+          headers: {
+            'Set-Cookie': `token=${token}; Path=/; HttpOnly; SameSite=Lax`,
+          },
+        });
+      }
     }
 
-    const mail: string = body.email;
-    
-    if(!mail || !emailRegex.test(mail)){
-        return new NextResponse("Wrong E-Mail Regex", {status: 400});
+    return new NextResponse(loginStatus, { status: 401 });
+  } else {
+    let sendEmail = true;
+    if (body.sendEmail != null) {
+      sendEmail = body.sendEmail;
     }
 
-    const code: number = body.code;
+    const issueResult = await issueAuthCode(mail.toLowerCase(), sendEmail);
+    console.log(`Issue auth code result for ${mail}: ${issueResult}`);
 
-    //Check if it is a code request (Code is part of Body)
-    if(code) {
-
-        const loginStatus = await evaluateAuthCode(mail, code);
-
-        console.log("*********\n Result of Request to /api/login (w/ AuthCode): \n Email: " + mail + " \n LoginStatus: " + loginStatus + "\n*********");
-
-        if (loginStatus == AuthCodeEvaluationResult.SUCCESS) {
-
-            let userData: User | undefined = await getUser(mail.toLocaleLowerCase());
-
-            console.log("UD:" + userData)
-
-            if(!userData){
-                console.log("WOM")
-
-                const usr = await insertUser(mail, false);
-
-
-                const token = await createToken(
-                    {
-                        id: 999,
-                        email: mail,
-                        isAdmin: false,
-                        startCountry: usr.startcountry,
-                        name: await getNameFromEmail(mail as string)
-                    });
-
-                console.log("Mfing token from someone who has no user account", token)
-    
-                // Set the token as a cookie
-                return new NextResponse("User Logged In", {
-                    status: 200,
-                    headers: {
-                        'Set-Cookie': `token=${token}; Path=/; HttpOnly; SameSite=Lax`,
-                    },
-                });
-
-            }else{
-
-                userData = await checkCountry(userData);
-
-                const token = await createToken(
-                    {
-                        id: userData.email,
-                        email: userData.email,
-                        isAdmin: userData.isAdmin,
-                        startCountry: (userData.startcountry ? userData.startcountry : ""),
-                        name: await getNameFromEmail(userData.email as string)
-                    });
-    
-                console.log("Mfing token", token)
-    
-                // Set the token as a cookie
-                return new NextResponse("User Logged In", {
-                    status: 200,
-                    headers: {
-                        'Set-Cookie': `token=${token}; Path=/; HttpOnly; SameSite=Lax`,
-                    },
-                });
-
-            }
-
-        }
-
-        return new NextResponse(loginStatus)
-    }else{
-        let sendEmail = true;
-        if(body.sendEmail != null){
-            console.log("BODY SENDEMAIL")
-            sendEmail = body.sendEmail;
-        }
-        console.log("fuck")
-        console.log(await issueAuthCode(mail, sendEmail))
-        console.log("fucked");
-        return new NextResponse("CODE SENT", { status: 201 })
+    if (issueResult === AuthCodeIssueingResult.SUCCESS) {
+      return new NextResponse("CODE SENT", { status: 201 });
     }
-
+    return new NextResponse(issueResult, { status: 500 });
+  }
 }

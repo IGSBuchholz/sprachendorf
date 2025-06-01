@@ -9,6 +9,7 @@ import Link from "next/link";
 import {Variants, motion} from "framer-motion";
 import { ExportButton } from "@/lib/exportpdf";
 import {boolean} from "drizzle-orm/pg-core";
+import {Role} from "@prisma/client";
 
 const variants: Variants = {
     initial: { opacity: 0, y: 20 },
@@ -92,23 +93,32 @@ function Dashboard({ user }) {
                         <h2 className="text-3xl font-extrabold text-black mb-8 text-center">
                             {user.name}
                         </h2>
-                        <QRCode className={"mx-auto"} value={user.email}/>
+                        <QRCode className={"mx-auto"} value={"...." + user.email}/>
                     </div>
                 </div>
             </div>
 
-            {user.isAdmin ?
+            {user.role != Role.USER ?
                 <div className="flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
                     <Link href={'/loggedin/dashboard/scanner'} className="max-w-md w-full bg-blue-500 rounded-lg shadow-md overflow-hidden py-6 text-center cursor-pointer hover:scale-110">
                         Kurse-Verifizieren
                     </Link>
-                </div>: ""}
+                </div>
+                : ""}
+
+            {(user.role == (Role.TEACHER) || user.role == Role.ADMIN) ?
+                <div className="flex items-center justify-center bg-white pb-12 px-4 sm:px-6 lg:px-8">
+                    <Link href={'/loggedin/dashboard/orga/changeroles'}
+                          className="max-w-md w-full bg-blue-500 rounded-lg shadow-md overflow-hidden py-6 text-center cursor-pointer hover:scale-110">
+                        {user.role === Role.TEACHER ? 'Helfer hinzufügen / ' : 'Nutzer'} verwalten
+                    </Link>
+                </div> : ""}
 
             <div className=" flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-md w-full bg-white rounded-lg shadow-md overflow-hidden">
                     <div className="p-6">
                         <h2 className="text-3xl font-extrabold text-black mb-8 text-center">
-                            Abgeschlossene Stationen
+                        Abgeschlossene Stationen
                         </h2>
                         { events.showPDF ? <ExportButton coursesDone={coursesDone} usersname={user.name} /> : ""}
                         { coursesDone.length > 0 ? <div className="grid grid-cols-3 gap-4">

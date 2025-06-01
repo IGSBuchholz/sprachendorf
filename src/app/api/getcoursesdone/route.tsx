@@ -1,52 +1,47 @@
 //@ts-nocheck
-import {NextRequest, NextResponse} from "next/server";
-import {getDatabaseConnection} from "@/lib/databsemanager";
-import {courses} from "@/lib/conutries";
-import {parse} from "cookie";
-import {verifyToken} from "@/lib/sessionmanager";
-import {courseCompletitions} from "@/lib/coursecompletition";
-import {eq} from "drizzle-orm";
+import { NextRequest, NextResponse } from "next/server";
+import { parse } from "cookie";
+import { verifyToken } from "@/lib/sessionmanager";
+import { prisma } from "@/lib/prisma";
 
-export let courseCache = new Map();
+export let courseCache = new Map<string, Array<{ country: string; level: number; niveau: number; imglink: string | null }>>();
 
 export async function GET(req: NextRequest) {
+  const cookies = parse(req.cookies.toString() || '');
+  if (cookies) {
+    const token = cookies.token;
 
-    const cookies = parse(req.cookies.toString() || '')
-    if(cookies){
-        const token = cookies.token
+    if (token) {
+      const verificationResult = await verifyToken(token);
 
-        if (token) {
+      if (verificationResult) {
+        const email = verificationResult.email;
 
-            const verificationResult = await verifyToken(token);
-
-            if(courseCache.has(token)){
-
-                return new NextResponse( JSON.stringify(courseCache.get(verificationResult?.email)), { status: 200 });
-
-            }
-
-            console.log("Verify:", verificationResult);
-
-            if(verificationResult){
-
-                const conn = await getDatabaseConnection()
-
-                const res = await conn.select({
-                    country: courseCompletitions.country,
-                    level: courseCompletitions.level,
-                    niveau: courseCompletitions.niveau,
-                    imglink: courses.imglink,
-                }).from(courseCompletitions).where(eq(verificationResult.email, courseCompletitions.email)).leftJoin(courses, eq(courseCompletitions.country, courses.country));
-
-                courseCache.set(verificationResult.email, res);
-
-                return new NextResponse( JSON.stringify(res), { status: 200 });
-            }
-            return new NextResponse('Token not valid', { status: 401 });
-
+        if (courseCache.has(email)) {
+          return new NextResponse(JSON.stringify(courseCache.get(email)), { status: 200 });
         }
+
+        console.log("Verify:", verificationResult);
+
+        try {
+          const res = await prisma.$queryRaw<Array<{ country: string; level: number; niveau: number; imglink: string | null }>>`
+            SELECT cc.country, cc.level, cc.niveau, c.imglink
+            FROM coursecompletition cc
+            LEFT JOIN courses c ON cc.country = c.language
+            WHERE cc.email = ${email};
+          `;
+
+          courseCache.set(email, res);
+          return new NextResponse(JSON.stringify(res), { status: 200 });
+        } catch (error) {
+          console.error('Failed to fetch course completitions:', error);
+          return new NextResponse('Database error', { status: 500 });
+        }
+      }
+
+      return new NextResponse('Token not valid', { status: 401 });
     }
+  }
 
-    return new NextResponse('Nothing here?! O_O', { status: 401 });
-
+  return new NextResponse('Nothing here?! O_O', { status: 401 });
 }

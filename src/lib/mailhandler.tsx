@@ -18,10 +18,15 @@ export async function getNameFromEmail(inputEmail: string){
 
 }
 
-var smtpob = async (email: string, code: string, apiKey = "") => {
+var smtpob = async (email: string, code: string, apiKey: string = "") => {
 
     if(apiKey==""){
-        apiKey=await getConfiguration('sg_ApiKey');
+        let res = await getConfiguration('sg_ApiKey')
+        if(typeof res != "string"){
+            console.error("NO sg_ApiKey configured!")
+            return;
+        }
+        apiKey = (await getConfiguration('sg_ApiKey'))!;
     }
 
     const usersName = await getNameFromEmail(email);
@@ -76,11 +81,14 @@ export async function sendLoginMail(email: string, authCode: number){
           method: "POST", // *GET, POST, PUT, DELETE, etc.
           headers: {
             "Content-Type": "application/json",
+              "X-Smtp2go-Api-Key": src?.api_key!,
+              "accept": "application/json"
           },
           body: JSON.stringify(src), // body data type must match "Content-Type" header
         });
 
         const resJson = await response.json();
+        console.log("Status:", response.status)
 
         console.log("ResJSOn", resJson.data.succeeded);
 

@@ -1,0 +1,66 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // e.g. postgres://user:pass@localhost:5432/mydb
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ───── Models ─────
+
+/// Stores application-wide key-value pairs (from config.tsx)
+model Config {
+  key   String  @id @db.VarChar(255)
+  value String?
+
+  @@map("config") // table name ⇢ config
+}
+
+/// Mirrors the `users` table from user.tsx
+model User {
+  id           Int     @id @default(autoincrement())
+  email        String  @db.Text
+  lastRequest  String? @db.Text // keep as text for parity; change to DateTime? if you prefer
+  role         Role?   @default(USER)
+  startcountry String? @db.Text
+
+  @@map("users") // table name ⇢ users
+}
+
+enum Role {
+  USER
+  HELPER
+  TEACHER
+  ADMIN
+}
+
+model AuthCode {
+  id        Int       @id @default(autoincrement())
+  email     String
+  authCode  Int?
+  expiresAt DateTime? @default(now())
+
+  @@map("authCode") // table name
+}
+
+model Course {
+  id       Int     @id @default(autoincrement())
+  /// Column `language` in the table → `country` in TypeScript
+  country  String  @map("language") @db.Text
+  levels   Int?    @db.Integer
+  imglink  String? @db.Text
+  maxusers Int?    @db.Integer
+
+  @@map("courses") // table name
+}
+
+model CourseCompletition {
+  id      Int     @id @default(autoincrement())
+  email   String
+  country String?
+  level   Int?
+  niveau  Int?
+
+  @@map("coursecompletition")
+}
