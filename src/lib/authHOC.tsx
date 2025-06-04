@@ -6,7 +6,6 @@ import type { Role } from '@prisma/client'
 import {roleIsGreaterOrEqual} from "@/lib/user/usermanager";
 
 
-
 //@ts-ignore
 const withAuth = (WrappedComponent, neededRole: Role = 'USER') => {
     //@ts-ignore
@@ -27,15 +26,28 @@ const withAuth = (WrappedComponent, neededRole: Role = 'USER') => {
                 console.log(data.user);
                 setUser(data.user);
                 setIsVerifying(false);
-                if(!roleIsGreaterOrEqual(data.user.role, neededRole)){
+                if(!(await roleIsGreaterOrEqual(data.user.role, neededRole))){
                     router.replace('/loggedin/dashboard')
                 }
             } else {
+
                 router.replace("/login"); // replace with your login route
             }
         }
 
-        verifyLogin()
+        const checkRoleChanges = async () => {
+
+            const res = await fetch('/api/logoutprompt');
+
+            if(res.status != 200){
+                router.push("/login");
+            }
+
+        }
+
+        verifyLogin().then(() => {
+            checkRoleChanges()
+        })
 
     }, [router])
 

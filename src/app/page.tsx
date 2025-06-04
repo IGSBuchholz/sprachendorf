@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, {useEffect} from 'react'
 import Head from 'next/head'
 import { motion, useAnimation } from 'framer-motion'
 import { useInView } from 'react-intersection-observer';
@@ -8,9 +8,12 @@ import { Carousel } from 'react-responsive-carousel'
 import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import Image from 'next/image';
 import Link from "next/link";
+import {Button} from "@nextui-org/react";
+import {getSession, signIn} from "next-auth/react";
 
 const Home: React.FC = () => {
-    
+
+
   const router = useRouter()
 
   return (
@@ -71,6 +74,7 @@ const Home: React.FC = () => {
             >
               <Link href={'/login'}>Loslegen</Link>
             </motion.div>
+            <Button onClick={() => {signIn()}}>Loslegen (next-auth)</Button>
 
           </div>
           

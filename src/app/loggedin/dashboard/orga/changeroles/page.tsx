@@ -222,7 +222,7 @@ function ScannerRoleComp({ user }: ScannerRoleProps) {
                                     )
                                     .map((u, idx) => (
                                         <motion.div
-                                            key={u.id}
+                                            key={u.email}
                                             variants={variants}
                                             initial="initial"
                                             animate="animate"

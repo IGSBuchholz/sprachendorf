@@ -1,9 +1,11 @@
+'use server'
 // @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
 import { parse } from "cookie";
 import { verifyToken } from "@/lib/sessionmanager";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@prisma/client";
+import {setRole} from "@/lib/user/usermanager";
 
 export async function POST(req: NextRequest) {
     const cookies = parse(req.cookies.toString() || "");
@@ -59,11 +61,8 @@ export async function POST(req: NextRequest) {
 
                 // Perform the update
                 try {
-                    const updatedUser = await prisma.user.update({
-                        where: { id: targetUser.id },
-                        data: { role: newRole },
-                    });
-                    return NextResponse.json({ message: "Role updated", user: updatedUser }, { status: 200 });
+                    await setRole(targetEmail, newRole)
+                    return NextResponse.json({ message: "Role updated" }, { status: 200 });
                 } catch (error) {
                     console.error("Failed to update role:", error);
                     return new NextResponse("Database error", { status: 500 });

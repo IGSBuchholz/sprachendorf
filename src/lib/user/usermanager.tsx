@@ -1,11 +1,25 @@
+'use server'
 import { prisma } from "@/lib/prisma";
 import type {User, Course, Role} from "@prisma/client";
 import { getCountries } from "@/lib/countriesmanager";
-
+import {redis} from "@/lib/redis";
 export async function getUser(emailAddress: string): Promise<User | null> {
-  return await prisma.user.findFirst({
-    where: { email: emailAddress.toLowerCase() }
+  const email = emailAddress.toLowerCase();
+  const cacheKey = `user:${email}`;
+  // Check Redis cache first
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return JSON.parse(cached) as User;
+  }
+  // Fetch from database if not in cache
+  const user = await prisma.user.findFirst({
+    where: { email }
   });
+  console.log("retrieving user from db", user)
+  if (user) {
+    await redis.set(cacheKey, JSON.stringify(user));
+  }
+  return user;
 }
 
 export async function updateUserLastRequest(email: string, lastRequestDate: Date): Promise<void> {
@@ -13,6 +27,8 @@ export async function updateUserLastRequest(email: string, lastRequestDate: Date
     where: { email: email.toLowerCase() },
     data: { lastRequest: lastRequestDate.toDateString() }
   });
+  const cacheKey = `user:${email.toLowerCase()}`;
+  await redis.del(cacheKey);
 }
 
 export async function insertUser(
@@ -29,6 +45,8 @@ export async function insertUser(
       startcountry: countryChosen.country
     }
   });
+  const cacheKey = `user:${email.toLowerCase()}`;
+  await redis.set(cacheKey, JSON.stringify(newUser));
   return newUser;
 }
 
@@ -39,6 +57,8 @@ export async function checkCountry(user: User): Promise<User> {
         where: { email: user.email.toLowerCase() },
         data: { startcountry: "" }
       });
+      const cacheKey = `user:${user.email.toLowerCase()}`;
+      await redis.del(cacheKey);
       user.startcountry = "";
     }
   }
@@ -49,6 +69,8 @@ export async function checkCountry(user: User): Promise<User> {
       where: { email: user.email.toLowerCase() },
       data: { startcountry: chosenCountry.country }
     });
+    const cacheKey = `user:${user.email.toLowerCase()}`;
+    await redis.del(cacheKey);
     user.startcountry = chosenCountry.country;
   }
 
@@ -64,7 +86,7 @@ const nonCourse: Course = {
 };
 
 
-export function roleIsGreaterOrEqual(inputRole: Role, comparisonRole: Role): boolean {
+export async function roleIsGreaterOrEqual(inputRole: Role, comparisonRole: Role): Promise<boolean> {
 
   switch (comparisonRole) {
     case "USER":
@@ -112,6 +134,8 @@ export async function setRole(
       where: { email: email.toLowerCase() },
       data: { role: newRole }
     });
+    const cacheKey = `user:${email.toLowerCase()}`;
+    await redis.del(cacheKey);
     return true;
   } catch (e) {
     return false;

@@ -19,8 +19,7 @@ model Config {
 
 /// Mirrors the `users` table from user.tsx
 model User {
-  id           Int     @id @default(autoincrement())
-  email        String  @db.Text
+  email        String  @id @db.Text
   lastRequest  String? @db.Text // keep as text for parity; change to DateTime? if you prefer
   role         Role?   @default(USER)
   startcountry String? @db.Text
@@ -63,4 +62,11 @@ model CourseCompletition {
   niveau  Int?
 
   @@map("coursecompletition")
+}
+
+model Kiosks {
+  key  String @id
+  name String
+
+  @@map("kiosks")
 }
