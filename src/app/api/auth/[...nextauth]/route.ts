@@ -20,6 +20,7 @@ const handler = NextAuth({
             // 1) We must ask for “openid” first, then “email” and “profile.”
             //    If you omit "openid", IServ’s /userinfo will reject you.
             scope: "openid email profile",
+            jwks_endpoint: env.AUTH_JWK,           //  [oai_citation:26‡ulasozdemir.com.tr](https://ulasozdemir.com.tr/enterprise-level-authentication-in-a-containerized-environment-for-nextjs-13-authjs-patch?utm_source=chatgpt.com) [oai_citation:27‡docs.propelauth.com](https://docs.propelauth.com/sso/enterprise-sso/nextauth?utm_source=chatgpt.com)
 
             // 2) IServ wants response_type=code and those scopes.
             authorization: {
