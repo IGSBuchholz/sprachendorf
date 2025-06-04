@@ -1,12 +1,13 @@
-import NextAuth from "next-auth"
+import NextAuth from "next-auth/next";
 import GithubProvider from "next-auth/providers/github"
 // auth.ts
 import { prisma } from "@/lib/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { insertUser } from "@/lib/user/usermanager";
+import {OAuthConfig} from "next-auth/providers";
 
 const env = process.env;
-export const handler = NextAuth({
+const handler = NextAuth({
     providers: [
         // @ts-ignore
         {
@@ -23,35 +24,9 @@ export const handler = NextAuth({
             userinfo: {
                 url: env.AUTH_USERINFOURL,
             },
-            clientId: env.OAUTH_ID,
-            clientSecret: env.OAUTH_SECRET
-        },
-        CredentialsProvider({
-            name: "Credentials",
-            credentials: {
-                username: { label: "Username", type: "text" },
-            },
-            async authorize(credentials) {
-                console.log(credentials);
-
-                // We already asserted credentials as { username: string } elsewhere
-                const { username: rawUsername } = credentials as { username: string };
-                let username: string = rawUsername;
-                if (!username.endsWith("@igs-buchholz.de")) {
-                    username += "@igs-buchholz.de";
-                }
-
-                let user = await prisma.user.findUnique({ where: { email: username } });
-                if (!user) {
-                    console.log("User not found");
-                    user = await insertUser(username);
-                }
-
-                console.log("User", user);
-                // Return an object that *matches* our augmented User type:
-                return { email: user.email, role: user.role, startcountry: user.startcountry };
-            },
-        }),
+            clientId: env.OAUTH_ID!,
+            clientSecret: env.OAUTH_SECRET!,
+        } as OAuthConfig<any>
     ],
     callbacks: {
         async jwt({ token, user }) {

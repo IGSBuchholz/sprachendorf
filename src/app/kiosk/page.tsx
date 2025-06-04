@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import {Suspense, useEffect, useState} from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import {useSearchParams} from "next/navigation";
 import { Variants, motion } from "framer-motion";
 import type { CourseCompletition } from "@prisma/client" // adjust this import if you have a shared type for completed courses
+import { isBrowser } from "is-in-browser";
 
 // Dynamically import the QR Scanner to avoid SSR issues
 import { Scanner } from "@yudiel/react-qr-scanner";
@@ -17,7 +18,16 @@ const variants: Variants = {
     exit: { opacity: 0, y: -20 },
 };
 
-export default function KioskPage() {
+export default function Page() {
+    return <>
+        <Suspense>
+            <KioskPage></KioskPage>
+        </Suspense>
+    </>
+}
+
+
+function KioskPage() {
     const searchParams = useSearchParams();
     const key = searchParams.get("key") || "";
 

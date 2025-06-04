@@ -4,7 +4,7 @@ import { parse } from "cookie";
 import { verifyToken } from "@/lib/sessionmanager";
 import { prisma } from "@/lib/prisma";
 
-export let courseCache = new Map<string, Array<{ country: string; level: number; niveau: number; imglink: string | null }>>();
+let courseCache = new Map<string, Array<{ country: string; level: number; niveau: number; imglink: string | null }>>();
 
 export async function GET(req: NextRequest) {
   const cookies = parse(req.cookies.toString() || '');
