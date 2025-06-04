@@ -15,6 +15,7 @@ const handler = NextAuth({
             name: "IServ",
             type: "oauth",
             version: "2.0",
+            issuer: "https://igs-buchholz.de",
 
             // 1) We must ask for “openid” first, then “email” and “profile.”
             //    If you omit "openid", IServ’s /userinfo will reject you.
