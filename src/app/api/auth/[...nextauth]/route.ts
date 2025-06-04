@@ -3,7 +3,7 @@ import GithubProvider from "next-auth/providers/github"
 // auth.ts
 import { prisma } from "@/lib/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { insertUser } from "@/lib/user/usermanager";
+import {getUser, insertUser} from "@/lib/user/usermanager";
 import {OAuthConfig} from "next-auth/providers";
 import {Profile} from "next-auth";
 
@@ -52,7 +52,7 @@ const handler = NextAuth({
             clientSecret: process.env.OAUTH_SECRET!,
 
             // 6) Map IServ’s userinfo JSON → NextAuth’s session.user
-            profile(profileJson: any) {
+            async profile(profileJson: any) {
                 // Oftentimes IServ’s `/userinfo` returns something like:
                 // {
                 //   "sub": "12345",
@@ -62,11 +62,18 @@ const handler = NextAuth({
                 //   "nachname": "Mustermann",
                 //   …other fields…
                 // }
+                let dbUser = await getUser(profileJson.email)
+                if (!dbUser) {
+                    dbUser = await insertUser(profileJson.email)
+                }
+
                 console.log("profileJson", profileJson);
                 return {
-                    id: profileJson.sub ?? profileJson.id ?? null,
+                    id: profileJson.sub,
                     name: profileJson.name ?? `${profileJson.vorname || ""} ${profileJson.nachname || ""}`.trim(),
                     email: profileJson.email,
+                    role: dbUser.role,
+                    startcountry: dbUser.startcountry
                     // you can spread any other fields you want into `session.user`:
                     // e.g. `role: profileJson.role`, etc.
                     // As long as they come back in JWT callbacks, they’ll end up in `session`.
