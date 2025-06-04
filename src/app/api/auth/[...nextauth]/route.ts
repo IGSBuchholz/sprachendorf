@@ -62,6 +62,7 @@ const handler = NextAuth({
                 //   "nachname": "Mustermann",
                 //   …other fields…
                 // }
+                console.log("profileJson", profileJson);
                 return {
                     id: profileJson.sub ?? profileJson.id ?? null,
                     name: profileJson.name ?? `${profileJson.vorname || ""} ${profileJson.nachname || ""}`.trim(),
