@@ -79,6 +79,13 @@ function Dashboard() {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const router = useRouter();
 
+    const getEmoji = (niveau: number) => {
+        if (niveau === 3) return "😁";
+        if (niveau === 2) return "🙂";
+        if (niveau === 1) return "😐";
+        return "";
+    };
+
     return <>
         <div className={"min-h-screen bg-white"}>
             <div className="flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
@@ -137,7 +144,7 @@ function Dashboard() {
                                         <div className="w-24 h-24 rounded-full overflow-hidden inline-block">
                                             <img src={course['imglink']} alt="flag" className="w-full h-full object-cover" />
                                         </div>
-                                        <h4 className="text-center">{course['country']} {course['level']}</h4>
+                                        <h4 className="text-center">{course['country']} {course['level']} {getEmoji(course['niveau'])}</h4>
                                     </div>
                                     </motion.div>
                                 )
