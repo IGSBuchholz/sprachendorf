@@ -66,22 +66,23 @@ const Home: React.FC = () => {
           </motion.p>
 
           <div className="mt-8 flex justify-center">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-black bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              <Button onClick={() => {signIn("iserv", { callbackUrl: "/loggedin/dashboard" })}}>Loslegen</Button>
-            </motion.div>
+
+            <motion.button initial={{opacity: 0}}
+                           animate={{opacity: 1}}
+                           className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-black bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                           transition={{duration: 0.5}} onClick={() => {
+              signIn("iserv", {callbackUrl: "/loggedin/dashboard"})
+            }}>Loslegen
+            </motion.button>
 
           </div>
-          
+
         </div>
       </main>
 
     </div>
   </div>
-)}
+  )
+}
 
 export default Home
