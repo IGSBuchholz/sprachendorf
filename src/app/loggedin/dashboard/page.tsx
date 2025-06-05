@@ -12,6 +12,8 @@ import {Role} from "@prisma/client";
 import {useSession} from "next-auth/react";
 import { LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
+import {ExportButton} from "@/lib/exportpdf";
+import {Suspense} from "react";
 
 const variants: Variants = {
     initial: { opacity: 0, y: 20 },
@@ -80,9 +82,9 @@ function Dashboard() {
     const router = useRouter();
 
     const getEmoji = (niveau: number) => {
-        if (niveau === 3) return "😁";
-        if (niveau === 2) return "🙂";
-        if (niveau === 1) return "😐";
+        if (niveau === 3) return "⭐️";
+        if (niveau === 2) return "😁";
+        if (niveau === 1) return "";
         return "";
     };
 
@@ -154,6 +156,9 @@ function Dashboard() {
                             <h3 className={"text-gray-400 text-center"}>Du hast noch keine Station abgeschlossen!</h3>
 
                         }
+                        <Suspense>
+                            <ExportButton coursesDone={coursesDone} usersname={user.name}></ExportButton>
+                        </Suspense>
                     </div>
                 </div>
             </div>

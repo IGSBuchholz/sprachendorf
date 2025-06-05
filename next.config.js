@@ -2,9 +2,14 @@
 const nextConfig = {
     experimental: {
         serverActions: true,
-        serverComponentsExternalPackages: ['pg', 'typeorm']
     },
+    serverExternalPackages: ['pg', 'typeorm', '@react-pdf/renderer'],
     output: "standalone",
+    webpack: (config) => {
+      config.resolve.alias.canvas = false;
+
+      return config;
+    },
 }
 
 module.exports = nextConfig

@@ -31,6 +31,13 @@ function KioskPage() {
     const searchParams = useSearchParams();
     const key = searchParams.get("key") || "";
 
+    const getEmoji = (niveau: number) => {
+        if (niveau === 3) return "⭐️";
+        if (niveau === 2) return "😁";
+        if (niveau === 1) return "";
+        return "";
+    };
+
     const [scannedValue, setScannedValue] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -220,7 +227,7 @@ function KioskPage() {
                                                     />
                                                 </div>
                                                 <p className="text-center text-sm font-medium">
-                                                    {course.country} ({course.level})
+                                                    <h4 className="text-center">{course['country']} {course['level']} {getEmoji(course['niveau']!)}</h4>
                                                 </p>
                                             </motion.div>
                                         );

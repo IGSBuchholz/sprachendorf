@@ -1,24 +1,32 @@
+'use client'
 //@ts-ignore
 //@ts-nocheck
-import { Document, Page, View, Image, Text, StyleSheet, PDFDownloadLink, Canvas } from '@react-pdf/renderer';
+import { Document, Page, View, Image, Text, StyleSheet, Canvas, PDFDownloadLink } from '@react-pdf/renderer';
 
+import dynamic from 'next/dynamic';
+
+// ...
+
+// @ts-ignore
 export const ExportButton = ({coursesDone, usersname}) => {
   const fileName = usersname
     ? `${usersname.split(' ')[0]}_${usersname.split(' ')[1] || ''}_courses.pdf`
     : 'courses.pdf';
-  return (
+  // @ts-ignore
+    return (
     <PDFDownloadLink
-      className="rounded-xl bg-blue-500 px-6 py-2 mx-auto flex justify-center mb-4"
+      className="rounded-xl bg-blue-500 px-6 py-2 mx-auto flex justify-center mb-4 cursor-pointer"
       document={<PdfDocument coursesDone={coursesDone} usersname={usersname} />}
       fileName={fileName}
     >
+        {/* @ts-ignore */}
       {({ blob, url, loading, error }) =>
         loading ? 'PDF wird erstellt...' : 'Als PDF herunterladen'
       }
     </PDFDownloadLink>
   );
 };
-
+{/* @ts-ignore */}
 const PdfDocument = ({coursesDone, usersname}) => {
   const displayName = usersname || '';
   const items = Array.isArray(coursesDone) ? coursesDone : [];
@@ -111,3 +119,4 @@ const PdfDocument = ({coursesDone, usersname}) => {
               </Document>
       );
   };
+        {/* @ts-ignore */}
