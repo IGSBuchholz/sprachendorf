@@ -53,7 +53,7 @@ export const authOptions: NextAuthOptions = {
                 //   nachname: "Mustermann",
                 //   … weitere Felder …
                 // }
-
+                console.log("pJ", JSON.stringify(profileJson));
                 // Prüfe, ob der User bereits in der Datenbank existiert
                 let dbUser = await getUser(profileJson.email);
                 if (!dbUser) {
