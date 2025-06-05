@@ -74,7 +74,7 @@ const Home: React.FC = () => {
             >
               <Link href={'/login'}>Loslegen</Link>
             </motion.div>
-            <Button onClick={() => {signIn()}}>Loslegen (next-auth)</Button>
+            <Button onClick={() => {signIn("iserv", { callbackUrl: "/loggedin/dashboard" })}}>Loslegen (next-auth)</Button>
 
           </div>
           
