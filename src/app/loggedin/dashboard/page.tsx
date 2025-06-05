@@ -12,7 +12,8 @@ import {Role} from "@prisma/client";
 import {useSession} from "next-auth/react";
 import { LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
-import {ExportButton} from "@/lib/exportpdf";
+import dynamic from "next/dynamic";
+const ExportButton = dynamic(() => import("@/lib/exportpdf").then(mod => mod.ExportButton), { ssr: false });
 import {Suspense} from "react";
 
 const variants: Variants = {
