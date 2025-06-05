@@ -45,6 +45,10 @@ export async function insertUser(
       startcountry: countryChosen.country
     }
   });
+  await redis.del("usersCached_visibleRoles" + 4);
+  await redis.del("usersCached_visibleRoles" + 3);
+  await redis.del("usersCached_visibleRoles" + 2);
+  await redis.del("usersCached_visibleRoles" + 1);
   const cacheKey = `user:${email.toLowerCase()}`;
   await redis.set(cacheKey, JSON.stringify(newUser));
   return newUser;
