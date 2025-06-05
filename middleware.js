@@ -1,5 +1,6 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
+import {Role} from "@prisma/client";
 
 export default withAuth(
     // `withAuth` augments your `Request` with the user's token.
@@ -11,12 +12,18 @@ export default withAuth(
         ) {
             return NextResponse.redirect(new URL("/api/auth/signin", req.url));
         }
-        console.log(req.nextauth);
-        if (
-            req.nextUrl.pathname === "/admin-dashboard" &&
-            req.nextauth.token?.role !== "admin"
-        ) {
-            return new NextResponse("You are not authorized!");
+        let isOrga = req.nextauth.token?.role == "TEACHER" || req.nextauth.token?.role == "ADMIN"
+        console.log("isOrga", isOrga)
+        console.log(req.nextUrl.pathname.toLowerCase().startsWith("/"))
+
+        if(req.nextUrl.pathname.toLowerCase().startsWith("/loggedin/orga/scanner")){
+
+            if(!(isOrga || req.nextauth.token?.role=="HELPER")){
+                return NextResponse.redirect(new URL("/loggedin/dashboard", req.url));
+            }
+
+        } else if (req.nextUrl.pathname.toLowerCase().startsWith("/loggedin/orga") && (!isOrga)) {
+            return NextResponse.redirect(new URL("/loggedin/dashboard", req.url));
         }
     },
     {
