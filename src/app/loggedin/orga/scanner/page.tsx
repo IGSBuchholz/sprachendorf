@@ -17,7 +17,7 @@ const variants: Variants = {
 
 
 //@ts-ignore
-function ScannerComp({ user }) {
+function ScannerComp() {
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [email, setEmail] = useState("Not found");
@@ -295,4 +295,4 @@ function ScannerComp({ user }) {
 }
 
 
-export default withAuth(ScannerComp, Role.HELPER)
+export default ScannerComp

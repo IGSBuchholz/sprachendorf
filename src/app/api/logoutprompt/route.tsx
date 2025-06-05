@@ -4,19 +4,18 @@ import {redis} from "@/lib/redis";
 import {parse} from "cookie";
 import {verifyToken} from "@/lib/sessionmanager";
 import {getUser} from "@/lib/user/usermanager";
+import {getServerSession} from "next-auth/next";
+import { authOptions } from "@/lib/authOptions";import {UserSession} from "@/lib/usersession";
+import {User} from "@prisma/client";
 
-// @ts-ignore
 async function GET(req: NextRequest) {
-    const cookies = parse(req.cookies.toString() || '');
-    if (cookies) {
-        const token = cookies.token;
+    // @ts-ignore
+    const session = await getServerSession(authOptions);
+    if(session && session.user) {
+        const user: UserSession  = session.user as UserSession;
+                const email = user.email!;
 
-        if (token) {
-            const verificationResult = await verifyToken(token);
-
-            if (verificationResult) {
-                const email = verificationResult.email;
-                const role = verificationResult.role
+        const role = user.role
 
                 let referenceUser = await getUser(email.toLowerCase())
                 if(!referenceUser) {
@@ -26,14 +25,10 @@ async function GET(req: NextRequest) {
                 console.log("rUr", referenceUser.role)
                 if (referenceUser.role != role) {
 
-                    // Invalidate user session by clearing the token cookie and redirecting to login
-                    const response = NextResponse.redirect(new URL('/login', req.url));
-                    response.cookies.set('token', '', { maxAge: 0, path: '/' });
-                    return response;
+                    return new NextResponse("LOG OUT", {status: 401});
                 }
                 return new NextResponse("ALL FINE", {status: 200});
-            }
-        }
+
     }
     return new NextResponse("ERROR", {status: 403});
 }

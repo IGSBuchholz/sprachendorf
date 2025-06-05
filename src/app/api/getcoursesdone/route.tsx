@@ -3,25 +3,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { parse } from "cookie";
 import { verifyToken } from "@/lib/sessionmanager";
 import { prisma } from "@/lib/prisma";
-
-let courseCache = new Map<string, Array<{ country: string; level: number; niveau: number; imglink: string | null }>>();
+import {getServerSession} from "next-auth";
+import { authOptions } from "@/lib/authOptions";import {NextApiRequest, NextApiResponse} from "next";
+import {redis} from "@/lib/redis";
 
 export async function GET(req: NextRequest) {
-  const cookies = parse(req.cookies.toString() || '');
-  if (cookies) {
-    const token = cookies.token;
+  // @ts-ignore
+  const session = await getServerSession(authOptions);
+  if (session) {
 
-    if (token) {
-      const verificationResult = await verifyToken(token);
-
-      if (verificationResult) {
-        const email = verificationResult.email;
-
-        if (courseCache.has(email)) {
-          return new NextResponse(JSON.stringify(courseCache.get(email)), { status: 200 });
+      let user = session.user;
+      const email = user.email;
+  console.log("d")
+        if (await redis.exists("cc_" + email)) {
+            console.log("le", JSON.stringify(await redis.get("cc_" + email)))
+            return new NextResponse(await redis.get("cc_" + email), { status: 200 });
         }
 
-        console.log("Verify:", verificationResult);
+        console.log("Verify:", user);
 
         try {
           const res = await prisma.$queryRaw<Array<{ country: string; level: number; niveau: number; imglink: string | null }>>`
@@ -31,16 +30,12 @@ export async function GET(req: NextRequest) {
             WHERE cc.email = ${email};
           `;
 
-          courseCache.set(email, res);
+          redis.set("cc_" + email, JSON.stringify(res));
           return new NextResponse(JSON.stringify(res), { status: 200 });
         } catch (error) {
           console.error('Failed to fetch course completitions:', error);
           return new NextResponse('Database error', { status: 500 });
         }
-      }
-
-      return new NextResponse('Token not valid', { status: 401 });
-    }
   }
 
   return new NextResponse('Nothing here?! O_O', { status: 401 });

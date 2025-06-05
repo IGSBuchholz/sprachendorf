@@ -20,7 +20,7 @@ const navItems = [
   { label: "Settings", href: "/admin/settings" },
 ];
 
-function AdminDashboardPage({ user }: { user: User & { role: Role } }) {
+function AdminDashboardPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -141,4 +141,4 @@ function AdminDashboardPage({ user }: { user: User & { role: Role } }) {
   );
 }
 
-export default withAuth(AdminDashboardPage, Role.ADMIN);
+export default AdminDashboardPage;

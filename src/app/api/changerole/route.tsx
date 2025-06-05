@@ -6,20 +6,17 @@ import { verifyToken } from "@/lib/sessionmanager";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@prisma/client";
 import {setRole} from "@/lib/user/usermanager";
-
-export async function POST(req: NextRequest) {
-    const cookies = parse(req.cookies.toString() || "");
-    if (cookies) {
-        const token = cookies.token;
-
-        if (token) {
-            const verificationResult = await verifyToken(token);
-            console.log("Verify:", verificationResult);
-
-            if (verificationResult) {
+import {getServerSession} from "next-auth";
+import {UserSession} from "@/lib/usersession";
+import { redis }from "@/lib/redis";
+import { authOptions } from "@/lib/authOptions";export async function POST(req: NextRequest) {
+    // @ts-ignore
+    const session = await getServerSession(authOptions);
+    if(session && session.user) {
+        const user: UserSession  = session.user as UserSession;
                 // Find the requesting user
                 const requestingUser = await prisma.user.findFirst({
-                    where: { email: verificationResult.email },
+                    where: { email: user.email },
                 });
                 if (!requestingUser) {
                     return new NextResponse("UNAUTHORIZED", { status: 401 });
@@ -32,6 +29,7 @@ export async function POST(req: NextRequest) {
                 // Parse request body
                 const body = await req.json();
                 const targetEmail = body.email?.toLowerCase();
+                console.log("tE", targetEmail);
                 const newRole: Role = body.newRole;
 
                 if (!targetEmail || !newRole) {
@@ -62,13 +60,16 @@ export async function POST(req: NextRequest) {
                 // Perform the update
                 try {
                     await setRole(targetEmail, newRole)
+                    await redis.del("usersCached_visibleRoles" + 4);
+                    await redis.del("usersCached_visibleRoles" + 3);
+                    await redis.del("usersCached_visibleRoles" + 2);
+                    await redis.del("usersCached_visibleRoles" + 1);
                     return NextResponse.json({ message: "Role updated" }, { status: 200 });
                 } catch (error) {
                     console.error("Failed to update role:", error);
                     return new NextResponse("Database error", { status: 500 });
                 }
-            }
-        }
+
     }
 
     return new NextResponse("UNAUTHORIZED", { status: 401 });

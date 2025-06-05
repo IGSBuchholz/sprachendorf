@@ -1,28 +1,13 @@
-import { parse } from 'cookie'
-import {NextRequest, NextResponse} from "next/server";
-import { verifyToken } from "../../../lib/sessionmanager";
 
-export async function GET(req: NextRequest) {
-    const cookies = parse(req.cookies.toString() || '')
-    if(cookies){
-        const token = cookies.token
-    
-        if (token) {
-            
-            const verificationResult = await verifyToken(token);
-    
-            console.log("Verify:", verificationResult);
-    
-            if(verificationResult){
-                // The user is logged in
-                return new NextResponse( JSON.stringify({'status': 'LOGGED_IN', 'user': verificationResult}), { status: 200 });
-            }
-            return new NextResponse('Token not valid', { status: 401 });
-    
-        }
-    }
-    
 
-    // The user is not logged in
-    return new NextResponse('Please log in', { status: 401 });
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/authOptions'; // adjust the import path to match your project
+
+export async function GET(request: Request) {
+  // @ts-ignore
+  const session = await getServerSession(authOptions);
+  const isLoggedIn = Boolean(session);
+  // @ts-ignore
+  return NextResponse.json({ loggedIn: isLoggedIn, "role": session.user.role, "email": session.user.email });
 }

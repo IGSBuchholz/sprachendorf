@@ -58,12 +58,13 @@ function KioskPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ key: key, qr: qrString }),
             });
-
+            console.log("Status", response.status)
             if (!response.ok) {
                 throw new Error("Failed to fetch user data");
             }
 
             const data = await response.json();
+            console.log("Status", JSON.stringify(data));
             // Expect data to have shape: { name, email, coursesDone: Array<{ country: string; level: number; imglink: string }> }
             if (!data || !data.coursesDone) {
                 throw new Error("No user data returned");
@@ -208,14 +209,14 @@ function KioskPage() {
                                                 animate="animate"
                                                 transition={{ duration: 0.3 + idx * 0.1 }}
                                             >
-                                                <div className="w-20 h-20 rounded-full overflow-hidden mb-2">
+                                                <div className="w-20 h-20 rounded-full overflow-hidden mb-2 flex items-center justify-center">
                                                     <Image
                                                         //@ts-ignore
                                                         src={course.imglink}
                                                         alt={`${course.country} Flagge`}
                                                         width={80}
                                                         height={80}
-                                                        className="object-cover"
+                                                        className="object-cover object-center"
                                                     />
                                                 </div>
                                                 <p className="text-center text-sm font-medium">

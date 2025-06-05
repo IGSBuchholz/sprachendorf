@@ -8,6 +8,9 @@ import { User, Role } from "@prisma/client";
 // Dynamically import the QR Scanner
 // @ts-ignore
 import { Scanner } from "@yudiel/react-qr-scanner";
+import {useSession} from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 const variants: Variants = {
     initial: { opacity: 0, y: 20 },
@@ -19,7 +22,7 @@ interface ScannerRoleProps {
     user: User & { role: Role };
 }
 
-function ScannerRoleComp({ user }: ScannerRoleProps) {
+function ScannerRoleComp() {
     // Step management:
     // 0 = loading users
     // 1 = search / list users
@@ -28,6 +31,9 @@ function ScannerRoleComp({ user }: ScannerRoleProps) {
     // 4 = confirm change
     // 5 = done / success
     const [step, setStep] = useState<number>(0);
+
+    const { data: session, status } = useSession();
+
 
     // List of all users (mocked or fetched)
     const [users, setUsers] = useState<User[]>([]);
@@ -39,10 +45,19 @@ function ScannerRoleComp({ user }: ScannerRoleProps) {
     // The user selected (either by clicking or scanning)
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isLoadingUserData, setIsLoadingUserData] = useState<boolean>(false);
-    const isSelf = selectedUser?.email == user.email;
+    const [isSelf, setIsSelf] = useState<boolean>(false);
 
     // The new role chosen
     const [newRole, setNewRole] = useState<Role | null>(null);
+    const router = useRouter();
+
+    function handleBack() {
+        if (step > 1 && step < 5) {
+            setStep(step - 1);
+        } else {
+            router.push('/loggedin/dashboard');
+        }
+    }
 
     // Define the ordered roles for ranking
     const allRoles: Role[] = [Role.USER, Role.HELPER, Role.TEACHER, Role.ADMIN];
@@ -52,9 +67,23 @@ function ScannerRoleComp({ user }: ScannerRoleProps) {
     // Compute which roles this “user” (logged-in helper/teacher/admin) is allowed to assign:
     // all roles whose rank ≤ own rank
     const allowableRoles: Role[] = useMemo(() => {
-        const ownRank = roleRank(user.role);
+        console.log("sess", session)
+        if(status == "loading"){
+           return allRoles;
+        }
+        // @ts-ignore
+        const ownRank = roleRank(session.user!.role);
         return allRoles.filter((r) => roleRank(r) <= ownRank);
-    }, [user.role]);
+    }, [session]);
+
+
+
+    useEffect(() => {
+        console.log("newSU", selectedUser)
+        // @ts-ignore
+        setIsSelf(status != "loading" ? selectedUser?.email == session!.user.email : false);
+    }, [selectedUser]);
+
 
     // Effect: fetch or mock the list of users once on mount
     useEffect(() => {
@@ -155,6 +184,7 @@ function ScannerRoleComp({ user }: ScannerRoleProps) {
     async function submitRoleChange() {
         if (!selectedUser || !newRole) return;
         try {
+            console.log("selectedUser", selectedUser.email);
             const res = await fetch('/api/changerole', {
                 method: 'POST',
                 headers: { "Content-Type": "application/json" },
@@ -192,9 +222,15 @@ function ScannerRoleComp({ user }: ScannerRoleProps) {
                     <div className="min-h-screen flex flex-col items-center justify-start bg-white py-12 px-4 sm:px-6 lg:px-8">
                         <div className="max-w-xl w-full bg-white rounded-lg shadow-md overflow-hidden">
                             <div className="p-6">
-                                <h2 className="text-3xl font-extrabold text-black mb-6">
-                                    Nutzer auswählen
-                                </h2>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-3xl font-extrabold text-black">
+                                        Nutzer auswählen
+                                    </h2>
+                                    <button onClick={handleBack} className="p-2 rounded-full hover:bg-gray-200 shadow-2xl bg-gray-100">
+                                        <ArrowLeft/>
+                                    </button>
+                                </div>
+
 
                                 <input
                                     type="text"
@@ -288,11 +324,18 @@ function ScannerRoleComp({ user }: ScannerRoleProps) {
                     transition={{ duration: 0.3 }}
                 >
                     <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
+
                         <div className="max-w-md w-full bg-white rounded-lg shadow-md overflow-hidden">
                             <div className="p-6">
-                                <h2 className="text-3xl font-extrabold text-black mb-8">
-                                    QR-Code scannen
-                                </h2>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-3xl font-extrabold text-black">
+                                        QR-Code Scannen
+                                    </h2>
+                                    <button onClick={handleBack}
+                                            className="p-2 rounded-full hover:bg-gray-200 shadow-2xl bg-gray-100">
+                                        <ArrowLeft/>
+                                    </button>
+                                </div>
                                 <div className="flex justify-center">
                                     {/* @ts-ignore */}
                                     <Scanner
@@ -323,11 +366,18 @@ function ScannerRoleComp({ user }: ScannerRoleProps) {
                     transition={{ duration: 0.3 }}
                 >
                     <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
+
                         <div className="max-w-md w-full bg-white rounded-lg shadow-md overflow-hidden">
                             <div className="p-6">
-                                <h2 className="text-3xl font-extrabold text-black mb-6">
-                                    Rolle ändern für:
-                                </h2>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-3xl font-extrabold text-black">
+                                        Rolle ändern für:
+                                    </h2>
+                                    <button onClick={handleBack}
+                                            className="p-2 rounded-full hover:bg-gray-200 shadow-2xl bg-gray-100">
+                                        <ArrowLeft/>
+                                    </button>
+                                </div>
                                 <div className="mb-4">
                                     <h3 className="text-lg font-medium text-black">
                                         {selectedUser.email}
@@ -345,11 +395,11 @@ function ScannerRoleComp({ user }: ScannerRoleProps) {
                                 <h3 className="text-xl font-semibold text-black mb-4">
                                     Neue Rolle wählen
                                 </h3>
-                                {isSelf && (
+                                {isSelf ?
                                     <p className="text-sm text-red-500 mb-4">
                                         Du kannst deine eigene Rolle nicht ändern.
                                     </p>
-                                )}
+                                : ""}
                                 <div className="flex flex-wrap gap-4">
                                     {allowableRoles.map((r, idx) => (
                                         <motion.div
@@ -417,11 +467,18 @@ function ScannerRoleComp({ user }: ScannerRoleProps) {
                     transition={{ duration: 0.3 }}
                 >
                     <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
+
                         <div className="max-w-md w-full bg-white rounded-lg shadow-md overflow-hidden">
                             <div className="p-6">
-                                <h2 className="text-3xl font-extrabold text-black mb-6">
-                                    Änderungen bestätigen
-                                </h2>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-3xl font-extrabold text-black">
+                                        Änderungen bestätigen
+                                    </h2>
+                                    <button onClick={handleBack}
+                                            className="p-2 rounded-full hover:bg-gray-200 shadow-2xl bg-gray-100">
+                                        <ArrowLeft/>
+                                    </button>
+                                </div>
                                 <div className="mb-6 space-y-3">
                                     <p className="text-black">
                                         <span className="font-semibold">Nutzer:</span>{" "}
@@ -489,6 +546,7 @@ function ScannerRoleComp({ user }: ScannerRoleProps) {
                     transition={{ duration: 0.3 }}
                 >
                     <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
+
                         <div className="max-w-sm w-full bg-white rounded-lg shadow-md overflow-hidden">
                             <div className="p-6 text-center">
                                 <h2 className="text-2xl font-extrabold text-green-600 mb-4">
@@ -517,4 +575,4 @@ function ScannerRoleComp({ user }: ScannerRoleProps) {
     );
 }
 
-export default withAuth(ScannerRoleComp, Role.TEACHER);
+export default ScannerRoleComp;

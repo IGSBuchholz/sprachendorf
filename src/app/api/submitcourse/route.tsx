@@ -5,20 +5,21 @@ import { verifyToken } from "@/lib/sessionmanager";
 import { prisma } from "@/lib/prisma";
 import { courseCache } from "@/app/api/getcoursesdone/route";
 import {decryptEmail} from "@/lib/ecrypt";
+import {redis} from "@/lib/redis";
+import {getServerSession} from "next-auth/next";
+import { authOptions } from "@/lib/authOptions";import {UserSession} from "@/lib/usersession";
+import {Role} from "@prisma/client";
 
 export async function POST(req: NextRequest) {
-  const cookies = parse(req.cookies.toString() || "");
-  if (cookies) {
-    const token = cookies.token;
-
-    if (token) {
-      const verificationResult = await verifyToken(token);
-      console.log("Verify:", verificationResult);
-
-      if (verificationResult) {
+  // @ts-ignore
+  const session = await getServerSession(authOptions);
+  if (session && session.user) {
+    const user: UserSession = session.user as UserSession;
         const body = await req.json();
         console.log("Reqbody", body);
-
+        if(user.role == Role.USER) {
+            return new NextResponse("UNAUTHORIZED (Role)", { status: 401 });
+        }
 
         try {
           await prisma.courseCompletition.create({
@@ -29,19 +30,19 @@ export async function POST(req: NextRequest) {
               niveau: body.courseNiveau,
             },
           });
+
         } catch (error) {
           console.error("Failed to insert course completition:", error);
           return new NextResponse("Database error", { status: 500 });
         }
 
-        if (courseCache.has(verificationResult.email)) {
-          courseCache.delete(verificationResult.email);
+        if (redis.exists("cc_" + body.email.toLowerCase())) {
+            console.log("deleted red")
+          redis.del(body.email.toLowerCase());
         }
 
         return new NextResponse("SUCCESS", { status: 200 });
       }
-    }
-  }
 
   return new NextResponse("UNAUTHORIZED", { status: 401 });
 }
