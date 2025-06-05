@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
         if (redis.exists("cc_" + body.email.toLowerCase())) {
             console.log("deleted red")
-          let s = await redis.del(body.email.toLowerCase());
+          let s = await redis.del("cc_" + body.email.toLowerCase());
             console.log("deleted red number", s)
         }
 
