@@ -47,6 +47,7 @@ function ScannerComp() {
           },
           body: bodyContent, // body data type must match "Content-Type" header
         });
+        console.log("response", response.status)
         setStep(2);
     }
 
@@ -219,17 +220,20 @@ function ScannerComp() {
                                 if (result){
                                     const emailRegex = new RegExp('^[a-zA-Z0-9._%+-]+@igs-buchholz\.de$')
                                     let rawValue = result[0].rawValue;
-                                    let rawValueSplit = result[0].rawValue.split("....");
-                                    console.log(rawValueSplit);
-                                    if((rawValueSplit.length != 2)){
-                                        return;
+                                    let rawValueSplit = (result[0].rawValue.replace("....", "...")).split("...");
+                                    let email = rawValueSplit[0];
+
+                                    if(rawValueSplit[1]) {
+                                        let temail = rawValueSplit[1].replace("%40", "@")
+                                        //@ts-ignore
+                                        setEmail(temail);
+                                        console.log("Res:", temail);
+                                    }else {
+                                        console.log("Res:", email);
                                     }
-                                    let email = rawValueSplit[1].replace("%40", "@")
+
                                     //@ts-ignore
-                                    setEmail(email);
-                                    console.log("Res:", rawValueSplit[1]);
-                                    //@ts-ignore
-                                    if(email.endsWith("@igs-buchholz.de") ){
+                                    if(email.endsWith("@igs-buchholz.de") || email.startsWith("https://sprachendorf.igsbuchholz.de")){
                                         console.log("E-Mail passed:", email)
                                         setStep(5);
                                     }

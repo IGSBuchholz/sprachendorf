@@ -20,11 +20,27 @@ export async function POST(req: NextRequest) {
         if(user.role == Role.USER) {
             return new NextResponse("UNAUTHORIZED (Role)", { status: 401 });
         }
+        let touse = body.email.toLowerCase();
+        console.log("email", body.email)
+        if(body.email.startsWith("https://sprachendorf.igsbuchholz.de")) {
+            let email = "";
+            let qr = body.email.split("....")[0];
+            qr = qr.replace("https://sprachendorf.igsbuchholz.de/user?id=", "")
+            console.log("qr")
+            email = await decryptEmail(qr, process.env.UUID_SALT)
+            console.log("email", email)
+            touse = email
+        }
+
+      function getRandomInt(max) {
+          return Math.floor(Math.random() * max);
+      }
 
         try {
           await prisma.courseCompletition.create({
             data: {
-              email: body.email.toLowerCase(),
+                id: getRandomInt(9999999),
+              email: touse,
               country: body.course.country,
               level: body.level,
               niveau: body.courseNiveau,
