@@ -93,8 +93,8 @@ function KioskPage() {
         const raw = result[0].rawValue as string;
         console.log(raw)
         // Verify format: must match "https://sprachendorf.igsbuchholz.de/user?id=..."
-        const pattern = /^https:\/\/sprachendorf\.igsbuchholz\.de\/user\?id=.+$/;
-        if (!pattern.test(raw)) {
+        const pattern = /^(?:https:\/\/sprachendorf\.igsbuchholz\.de\/user\?id=.+|[^@]+@igs-buchholz\.de)$/;
+        if (!pattern.test(raw))    {
             setErrorMessage("Ungültiges QR-Code-Format.");
             return;
         }
@@ -226,9 +226,9 @@ function KioskPage() {
                                                         className="object-cover object-center"
                                                     />
                                                 </div>
-                                                <p className="text-center text-sm font-medium">
+                                                <div className="text-center text-sm font-medium">
                                                     <h4 className="text-center">{course['country']} {course['level']} {getEmoji(course['niveau']!)}</h4>
-                                                </p>
+                                                </div>
                                             </motion.div>
                                         );
                                     })}

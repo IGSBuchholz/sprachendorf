@@ -221,21 +221,24 @@ function ScannerComp() {
                                     const emailRegex = new RegExp('^[a-zA-Z0-9._%+-]+@igs-buchholz\.de$')
                                     let rawValue = result[0].rawValue;
                                     let rawValueSplit = (result[0].rawValue.replace("....", "...")).split("...");
-                                    let email = rawValueSplit[0];
-
+                                    let nemail = rawValueSplit[0];
+                                    let used = ""
+                                    console.log("rawValueSplit", rawValueSplit);
                                     if(rawValueSplit[1]) {
                                         let temail = rawValueSplit[1].replace("%40", "@")
                                         //@ts-ignore
                                         setEmail(temail);
                                         console.log("Res:", temail);
+                                        used = temail;
                                     }else {
-                                        console.log("Res:", email);
-                                        setEmail(email);
+                                        console.log("Res:", nemail);
+                                        setEmail(nemail);
+                                        used = nemail;
                                     }
 
                                     //@ts-ignore
-                                    if(email.endsWith("@igs-buchholz.de") || email.startsWith("https://sprachendorf.igsbuchholz.de")){
-                                        console.log("E-Mail passed:", email)
+                                    if(used.endsWith("@igs-buchholz.de") || used.startsWith("https://sprachendorf.igsbuchholz.de")){
+                                        console.log("E-Mail passed:", used)
                                         setStep(5);
                                     }
                                 }

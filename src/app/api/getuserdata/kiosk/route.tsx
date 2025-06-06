@@ -32,8 +32,17 @@ export async function POST(req: NextRequest) {
     }
     let email = "";
     let qr = body.qr.split("....")[0];
-    qr = qr.replace("https://sprachendorf.igsbuchholz.de/user?id=", "")
-    email = await decryptEmail(qr, process.env.UUID_SALT)
+    if(!qr.startsWith("https://sprachendorf.igsbuchholz.de/user?id=")){
+        email = body.qr.split("....")[1];
+    }else {
+        qr = qr.replace("https://sprachendorf.igsbuchholz.de/user?id=", "")
+        // Decode any URL-encoded characters and trim whitespace to ensure valid Base64 input
+        qr = decodeURIComponent(qr);
+        qr = qr.trim();
+        console.log("qr")
+        email = await decryptEmail(qr, process.env.UUID_SALT)
+    }
+
     console.log("email", email)
     const res = await prisma.$queryRaw<Array<{ country: string; level: number; niveau: number; imglink: string | null }>>`
             SELECT cc.country, cc.level, cc.niveau, c.imglink
