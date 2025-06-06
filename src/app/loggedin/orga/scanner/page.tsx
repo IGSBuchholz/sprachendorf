@@ -230,6 +230,7 @@ function ScannerComp() {
                                         console.log("Res:", temail);
                                     }else {
                                         console.log("Res:", email);
+                                        setEmail(email);
                                     }
 
                                     //@ts-ignore
